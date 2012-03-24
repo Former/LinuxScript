@@ -1,0 +1,12 @@
+#!/bin/bash
+cd /
+sudo tar cvpzf sysbackup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
+--exclude=/proc \
+--exclude=/lost+found \
+--exclude=/sysbackup*.tgz \
+--exclude=/mnt \
+--exclude=/sys \
+--exclude=/home \
+--exclude=/media \
+--exclude=/tmp \
+/
