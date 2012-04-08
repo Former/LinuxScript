@@ -1,3 +1,6 @@
 #!/bin/bash
-sudo apt-get install deluge mc audacious easystroke xneur tuxguitar tuxguitar cheese gnome-rdp geany q4wine wine compiz emerald git-core gcc linux-headers-`uname -r` 
+sudo apt-get install deluge mc audacious easystroke xneur tuxguitar \
+ tuxguitar cheese gnome-rdp geany wine compiz emerald git-core gcc \
+ linux-headers-`uname -r` openss-server xrdp flashplugin-installer \
+ q4wine
 
