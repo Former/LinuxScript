@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# -------------Входные параметры---------------
+
+# Максимальное колличество файлов, которое должно остаться
+maxFilesCount=$1
+# Набор файлов, первые из которых будут удалены
+files=$2
+
+# -------------Выходной параметр---------------
+# Файлы, которые нужно удалить
+delFiles=""
+
+# ---------------------------------------------
+# Вычисляем колличество файлов
+filesCount=0
+for i in $files
+do
+	let filesCount++
+done
+
+# Записываем файлы для удаления в переменную delFiles
+
+if [ $maxFilesCount -lt $filesCount ]
+then
+	
+	delFilesIndex=0
+	let delFilesCount=filesCount-maxFilesCount
+
+	for i in $files
+	do
+		if [ $delFilesIndex -lt $delFilesCount ]
+		then
+			delFiles=`echo -en "${delFiles}\n${i}"`
+		fi
+		let delFilesIndex++
+	done
+
+fi
+
+echo $delFiles
+

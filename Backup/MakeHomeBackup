@@ -1,4 +1,11 @@
 #!/bin/bash
+
+# Выясняем, какие старые архивы нам нужно удалить
+maxFilesCount=3
+files=`find /home/home_backup_*|sort`
+delFiles=`./GetDelFileList $maxFilesCount "${files}"`
+
+# Делаем бекап
 cd /home
 sudo tar cvpzf home_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
 --exclude=home_backup*.tgz \
@@ -6,3 +13,9 @@ sudo tar cvpzf home_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
 --exclude=.mozilla/firefox/*.default/Cache \
 --exclude=.googleearth/Cache \
 .
+
+# Удаляем старые архивы
+for i in $delFiles
+do
+	sudo rm $i
+done

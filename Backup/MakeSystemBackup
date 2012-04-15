@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# Выясняем, какие старые архивы нам нужно удалить
+maxFilesCount=3
+files=`find /sysbackup_*|sort`
+delFiles=`./GetDelFileList $maxFilesCount "${files}"`
+
 cd /
 sudo tar cvpzf sysbackup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
 --exclude=/proc \
@@ -10,3 +16,9 @@ sudo tar cvpzf sysbackup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
 --exclude=/media \
 --exclude=/tmp \
 /
+
+# Удаляем старые архивы
+for i in $delFiles
+do
+	sudo rm $i
+done
