@@ -14,6 +14,7 @@ sudo tar cvpzf sysbackup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
 --exclude=/sys \
 --exclude=/home \
 --exclude=/media \
+--exclude=/usr/share/games \
 --exclude=/tmp \
 /
 
