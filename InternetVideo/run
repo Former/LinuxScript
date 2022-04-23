@@ -1,0 +1,25 @@
+#!/bin/bash
+
+curdir=$(pwd)
+
+cd "$curdir"
+
+cat dl-list | while read LINE; 
+do
+    echo "read line: $LINE"
+    array=(${LINE// / })
+    folder=${array[0]}
+    url=${array[1]}
+    echo "$(date +%yy%mm%dd-%Hh%Mm%Ss): Folder $folder, Url $url" >> "$curdir/1sys_log.txt"
+
+    cd "$curdir"
+
+    mkdir "$folder"
+    cd "$folder"
+
+    find . -mtime +30 -type f -delete >> "$curdir/1sys_log.txt"
+
+    $curdir/dl_video $url >> "$curdir/1log.txt"
+done
+
+
