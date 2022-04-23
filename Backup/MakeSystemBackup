@@ -1,19 +1,23 @@
 #!/bin/bash
 
 # Выясняем, какие старые архивы нам нужно удалить
-maxFilesCount=3
+maxFilesCount=2
 files=`find /sysbackup_*|sort`
 delFiles=`./GetDelFileList $maxFilesCount "${files}"`
 
+backup_dir=""
+
 cd /
-sudo tar cvpzf sysbackup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
+sudo tar cvpzf $(backup_dir)/$(hostname)_sysbackup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
 --exclude=/proc \
 --exclude=/lost+found \
---exclude=/sysbackup*.tgz \
+--exclude=/*sysbackup*.tgz \
 --exclude=/mnt \
 --exclude=/sys \
 --exclude=/home \
 --exclude=/media \
+--exclude=/var/cache \
+--exclude=/var/tmp \
 --exclude=/usr/share/games \
 --exclude=/tmp \
 /

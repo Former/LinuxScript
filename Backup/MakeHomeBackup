@@ -1,18 +1,37 @@
 #!/bin/bash
 
 # Выясняем, какие старые архивы нам нужно удалить
-maxFilesCount=3
+maxFilesCount=2
 files=`find /home/home_backup_*|sort`
 delFiles=`./GetDelFileList $maxFilesCount "${files}"`
 
+backup_dir="/home"
+
 # Делаем бекап
 cd /home
-sudo tar cvpzf home_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
---exclude=home_backup*.tgz \
+sudo tar cvpzf $(backup_dir)/$(hostname)_home_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
+--exclude=*home_backup*.tgz \
 --exclude=.thumbnails \
 --exclude=.mozilla/firefox/*.default/Cache \
 --exclude=.googleearth/Cache \
+--exclude=*/.cache/* \
+--exclude=.cache \
+--exclude=.local \
+--exclude=.steam/config/htmlcache/ \
+--exclude=.steam/appcache/ \
+--exclude=.steam/package \
+--exclude=.steam/ubuntu12_32 \
+--exclude=.local/share/Steam \
+--exclude=.smartgit/updates \
+--exclude=.wine*/*/windows/ \
+--exclude=.googleearth \
+--exclude=*/.Genymobile \
+--exclude=*/.config/skypeforlinux/Cache \
+--exclude=*/3D_Model/assets \
+--exclude=private \
+--exclude=MyProgs \
 .
+
 
 # Удаляем старые архивы
 for i in $delFiles
