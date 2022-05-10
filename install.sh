@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Linux Mint
+
 sudo aptitude install chromium-browser gimp geany geany-plugins screen \
  gcc virtualbox-qt virtualbox-ext-pack icewm idesk dillo links2 smtube \
  vlc mpv mc openssh-server mplayer-gui texstudio volumeicon-alsa \
@@ -10,3 +13,7 @@ sudo aptitude install chromium-browser gimp geany geany-plugins screen \
  deluge easystroke
 
 sudo apt install --install-recommends winehq-stable
+
+# Alt Linux
+sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk dillo links2 smtube vlc mpv mc openssh-server mplayer-gui texstudio volumeicon git ffmpeg remmina xrdp nmap gparted redshift stellarium  minetest widelands sshfs encfs pcmanfm xclip clang gitg gitk git-cola texlive pwgen cheese gxneur xneur audacious deluge  gnome-disk-utility
+
