@@ -21,3 +21,4 @@ sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
  minetest widelands sshfs encfs pcmanfm xclip clang gitg gitk git-cola \
  texlive pwgen cheese gxneur xneur audacious deluge  gnome-disk-utility
 
+sudo apt-get install cinnamon
