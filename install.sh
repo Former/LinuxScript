@@ -15,6 +15,9 @@ sudo aptitude install chromium-browser gimp geany geany-plugins screen \
 sudo apt install --install-recommends winehq-stable
 
 # Alt Linux
+sudo systemctl enable sshd.service
+sudo systemctl start sshd.service
+
 sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
  dillo links2 smtube vlc mpv mc openssh-server mplayer-gui texstudio \
  volumeicon git ffmpeg remmina xrdp nmap gparted redshift stellarium  \
@@ -22,4 +25,14 @@ sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
  texlive pwgen cheese gxneur xneur audacious deluge  gnome-disk-utility
 
 sudo apt-get install cinnamon systemd-settings-disable-kill-user-processes \
- firefox
+ firefox xviewer
+
+sudo eepm play skype
+sudo eepm play telegram
+sudo eepm play zoom
+
+wget https://packages.ntop.org/centos-stable/8/x86_64/Packages/n2n-2.8.0-540.x86_64.rpm
+sudo apt-get install ./n2n-2.8.0-540.x86_64.rpm
+
+sudo systemctl enable edge.service
+sudo systemctl start edge.service
