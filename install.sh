@@ -25,7 +25,9 @@ sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
  texlive pwgen cheese gxneur xneur audacious deluge  gnome-disk-utility
 
 sudo apt-get install cinnamon systemd-settings-disable-kill-user-processes \
- firefox xviewer
+ firefox xviewer gnome-system-monitor filezilla
+
+sudo apt-get install golang sqlite3 nodejs
 
 sudo eepm play skype
 sudo eepm play telegram
