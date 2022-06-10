@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Выясняем, какие старые архивы нам нужно удалить
-maxFilesCount=2
-files=`find /home/home_backup_*|sort`
-delFiles=`./GetDelFileList $maxFilesCount "${files}"`
-
+maxFilesCount=3
 backup_dir="/home"
+
+# Выясняем, какие старые архивы нам нужно удалить
+files=`find ${backup_dir}/*home_backup_*|sort`
+delFiles=`./GetDelFileList $maxFilesCount "${files}"`
 
 # Делаем бекап
 cd /home
-sudo tar cvpzf $(backup_dir)/$(hostname)_home_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz \
+sudo tar cvpzf "${backup_dir}/$(hostname)_home_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz" \
 --exclude=*home_backup*.tgz \
 --exclude=.thumbnails \
 --exclude=.mozilla/firefox/*.default/Cache \
@@ -30,6 +30,9 @@ sudo tar cvpzf $(backup_dir)/$(hostname)_home_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss
 --exclude=*/3D_Model/assets \
 --exclude=private \
 --exclude=MyProgs \
+--exclude=go/pkg \
+--exclude=.apt \
+--exclude=.npm \
 .
 
 
