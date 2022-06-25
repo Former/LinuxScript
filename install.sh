@@ -26,6 +26,11 @@ sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
 
 sudo apt-get install cinnamon systemd-settings-disable-kill-user-processes \
  firefox xviewer gnome-system-monitor filezilla baobab gedit
+ 
+sudo apt-get install nemo nemo-emblems nemo-fileroller \
+ nemo-compare nemo-share-common nemo-arronax nemo-preview nemo-python-devel \
+ nemo-extensions-translations nemo-translations nemo-terminal nemo-share \
+ nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk
 
 sudo apt-get install golang sqlite3 nodejs
 
