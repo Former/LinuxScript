@@ -18,6 +18,10 @@ sudo apt install --install-recommends winehq-stable
 sudo systemctl enable sshd.service
 sudo systemctl start sshd.service
 
+sudo apt-get update
+sudo apt-get dist-upgrade
+sudo update-kernel
+
 sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
  dillo links2 smtube vlc mpv mc openssh-server mplayer-gui texstudio \
  volumeicon git ffmpeg remmina xrdp nmap gparted redshift stellarium  \
@@ -43,3 +47,5 @@ sudo apt-get install ./n2n-2.8.0-540.x86_64.rpm
 
 sudo systemctl enable edge.service
 sudo systemctl start edge.service
+
+git config --global core.editor mcedit
