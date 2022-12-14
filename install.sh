@@ -49,3 +49,9 @@ sudo systemctl enable edge.service
 sudo systemctl start edge.service
 
 git config --global core.editor mcedit
+
+# Gps
+sudo apt-get install xgps gpsd gpsmon
+/etc/sysconfig/gpsd ->
+OPTIONS="-n"
+DEVICES="/dev/ttyACM0"
