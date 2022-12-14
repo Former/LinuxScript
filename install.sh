@@ -49,4 +49,4 @@ git config --global core.editor mcedit
 sudo apt-get install xgps gpsd gpsmon
 /etc/sysconfig/gpsd ->
 OPTIONS="-n"
-DEVICES="/dev/ttyACM0"
+DEVICES="/dev/ttyACM0 /dev/ttyACM1"
