@@ -32,7 +32,8 @@ sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
  nemo-compare nemo-share-common nemo-arronax nemo-preview nemo-python-devel \
  nemo-extensions-translations nemo-translations nemo-terminal nemo-share \
  nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk \
- golang sqlite3 nodejs
+ golang sqlite3 nodejs \
+ cpu-x
 
 sudo eepm play skype
 sudo eepm play telegram
