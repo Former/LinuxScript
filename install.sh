@@ -33,7 +33,7 @@ sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
  nemo-extensions-translations nemo-translations nemo-terminal nemo-share \
  nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk \
  golang sqlite3 nodejs \
- build-environment ctest gcc-c++ flex \
+ build-environment ctest gcc-c++ flex libncurses-devel \
  cpu-x
 
 sudo eepm play skype
