@@ -47,6 +47,13 @@ sudo systemctl enable --now edge.service
 
 git config --global core.editor mcedit
 
+## Flathub
+## organicmaps
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub app.organicmaps.desktop
+sudo flatpak update --commit=316cb476f2777b10f74801eddbedbf329d6d891b667d20779ff1ba740e838df0 app.organicmaps.desktop
+flatpak run app.organicmaps.desktop
+
 # Gps
 sudo apt-get install xgps gpsd gpsmon
 /etc/sysconfig/gpsd ->
