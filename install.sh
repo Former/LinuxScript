@@ -26,14 +26,14 @@ sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
  volumeicon git ffmpeg remmina xrdp nmap gparted redshift stellarium  \
  minetest widelands sshfs encfs pcmanfm xclip clang gitg gitk git-cola \
  texlive pwgen cheese gxneur xneur audacious deluge  gnome-disk-utility \
- cinnamon-full systemd-settings-disable-kill-user-processes \
+ cinnamon-full systemd-settings-disable-kill-user-processes retext \
  firefox xviewer gnome-system-monitor filezilla baobab gedit \
  nemo nemo-emblems nemo-fileroller \
  nemo-compare nemo-share-common nemo-arronax nemo-preview nemo-python-devel \
  nemo-extensions-translations nemo-translations nemo-terminal nemo-share \
  nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk \
  golang sqlite3 nodejs \
- cpu-x
+ cpu-x 
 
 sudo eepm play skype
 sudo eepm play telegram
