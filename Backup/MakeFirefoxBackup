@@ -1,0 +1,10 @@
+#!/bin/bash
+
+backup_dir="."
+
+# Делаем бекап
+cd ~
+tar cvpzf "${backup_dir}/$(hostname)_mozilla_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz" \
+--exclude=.mozilla/firefox/*.default/Cache \
+.mozilla
+
