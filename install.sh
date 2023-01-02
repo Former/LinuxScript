@@ -14,6 +14,7 @@ sudo aptitude install chromium-browser gimp geany geany-plugins screen \
 
 sudo apt install --install-recommends winehq-stable
 
+# -----------------------------------------------------------------------
 # Alt Linux
 sudo systemctl enable --now sshd.service
 
@@ -76,3 +77,7 @@ hwmon /sys/class/thermal/thermal_zone0/temp
 
 test: sudo /usr/sbin/thinkfan -n
 systemctl enable --now thinkfan.service
+
+# XnConvert
+Download: https://www.xnview.com/en/xnconvert/#downloads
+sudo epm install ./XnConvert-linux-x64.deb
