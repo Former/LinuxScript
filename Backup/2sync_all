@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Двухсторонняя синхронизация с сервером всех объектов в текущей папке
+# Использование:
+# 2sync_all filter dest_base opt
+#   filter - маска по файлам
+#   dest_base - базовый путь для синхронизации, может содержать сервер, например: backup@www_server:/media/Backup
+#   opt - дополнительные опции rsync. Для теста можно использовать: opt = -n 
+
+filter=$1
+dest_base=$2
+opt=$3
+
+files=`ls -p | grep / | grep ${filter} |sort`
+
+cur_dir="$(pwd)/"
+
+for file in $files; do 
+    src="${cur_dir}/${file}/"
+    dest="${dest_base}/${file}/"
+
+    ./2sync $src $dest $opt
+done
+
+
+
+
