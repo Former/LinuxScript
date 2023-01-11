@@ -35,7 +35,7 @@ sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
  nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk \
  golang sqlite3 nodejs \
  build-environment ctest gcc-c++ flex libncurses-devel \
- cpu-x
+ cpu-x pdfmod
 
 sudo eepm play skype
 sudo eepm play telegram
@@ -81,3 +81,11 @@ systemctl enable --now thinkfan.service
 # XnConvert
 Download: https://www.xnview.com/en/xnconvert/#downloads
 sudo epm install ./XnConvert-linux-x64.deb
+
+# Disable autostart gnome-software
+mkdir -pv ~/.config/autostart && cp /etc/xdg/autostart/gnome-software-service.desktop ~/.config/autostart/
+echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/gnome-software-service.desktop
+dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
+
+dconf write /org/gnome/software/allow-updates false
+dconf write /org/gnome/software/download-updates false
