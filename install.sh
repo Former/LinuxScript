@@ -89,3 +89,6 @@ dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.d
 
 dconf write /org/gnome/software/allow-updates false
 dconf write /org/gnome/software/download-updates false
+
+# fuse config
+sudo control fusermount public
