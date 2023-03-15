@@ -52,7 +52,8 @@ git config --global core.editor mcedit
 ## organicmaps
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install flathub app.organicmaps.desktop
-sudo flatpak update --commit=316cb476f2777b10f74801eddbedbf329d6d891b667d20779ff1ba740e838df0 app.organicmaps.desktop
+flatpak remote-info --log flathub app.organicmaps.desktop
+sudo flatpak update --commit=--commit=beb1e1a66d50646cfe162437bca7b19fdd9178e3f505fcdc351a74415dbca628 app.organicmaps.desktop
 flatpak run app.organicmaps.desktop
 
 # Gps
