@@ -35,7 +35,7 @@ sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
  nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk \
  golang sqlite3 nodejs \
  build-environment ctest gcc-c++ flex libncurses-devel \
- cpu-x pdfmod traceroute
+ cpu-x pdfmod traceroute testdisk
 
 sudo eepm play skype
 sudo eepm play telegram
