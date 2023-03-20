@@ -1,10 +1,18 @@
 #!/bin/bash
 
-backup_dir="."
+# Делает бэкап папки ~/.mozilla
+# Использование:
+# ./MakeFirefoxBackup backup_dir
+
+backup_dir=$1
+if [ "$backup_dir" == "" ]; then
+   backup_dir="."
+fi
 
 # Делаем бекап
 cd ~
 tar cvpzf "${backup_dir}/$(hostname)_mozilla_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz" \
---exclude=.mozilla/firefox/*.default/Cache \
+--exclude=.mozilla/firefox/*.*/Cache \
+--exclude=.mozilla/firefox/*.*/storage \
 .mozilla
 

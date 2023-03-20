@@ -1,25 +1,40 @@
 #!/bin/bash
 
-maxFilesCount=3
-backup_dir=""
+# Делает бэкап папки /
+# Использование:
+# ./MakeSysBackup backup_dir
 
+backup_dir=$1
+if [ "$backup_dir" == "" ]; then
+   backup_dir="/"
+fi
+
+maxFilesCount=3
 # Выясняем, какие старые архивы нам нужно удалить
 files=`find ${backup_dir}/*sysbackup_*|sort`
 delFiles=`./GetDelFileList $maxFilesCount "${files}"`
 
 cd /
+
+sudo tar cvpzf "${backup_dir}/$(hostname)_sys_etc_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz" \
+/etc
+
 sudo tar cvpzf "${backup_dir}/$(hostname)_sysbackup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz" \
 --exclude=/proc \
+--exclude=/dev \
 --exclude=/lost+found \
 --exclude=/*sysbackup*.tgz \
 --exclude=/mnt \
 --exclude=/sys \
 --exclude=/home \
 --exclude=/media \
+--exclude=/var/log \
 --exclude=/var/cache \
+--exclude=/var/lib/flatpak \
 --exclude=/var/tmp \
---exclude=/usr/share/games \
+--exclude=/usr/share \
 --exclude=/tmp \
+--exclude=/opt \
 /
 
 # Удаляем старые архивы

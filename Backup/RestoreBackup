@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo tar xvpzf %1 -C /
+
+sudo tar xvpzf $1 -C /

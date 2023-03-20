@@ -1,8 +1,15 @@
 #!/bin/bash
 
-maxFilesCount=3
-backup_dir="/home"
+# Делает бэкап папки /home
+# Использование:
+# ./MakeHomeBackup backup_dir
 
+backup_dir=$1
+if [ "$backup_dir" == "" ]; then
+   backup_dir="/home"
+fi
+
+maxFilesCount=3
 # Выясняем, какие старые архивы нам нужно удалить
 files=`find ${backup_dir}/*home_backup_*|sort`
 delFiles=`./GetDelFileList $maxFilesCount "${files}"`
@@ -12,21 +19,19 @@ cd /home
 sudo tar cvpzf "${backup_dir}/$(hostname)_home_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz" \
 --exclude=*home_backup*.tgz \
 --exclude=.thumbnails \
---exclude=.mozilla/firefox/*.default/Cache \
---exclude=.googleearth/Cache \
+--exclude=.mozilla/firefox/*.*/storage \
 --exclude=*/.cache/* \
 --exclude=.cache \
+--exclude=/.config/chromium/*/CacheStorage \
+--exclude=*/.config/skypeforlinux/Cache \
 --exclude=.local \
---exclude=.steam/config/htmlcache/ \
---exclude=.steam/appcache/ \
---exclude=.steam/package \
---exclude=.steam/ubuntu12_32 \
---exclude=.local/share/Steam \
+--exclude=.var/app/app.organicmaps.desktop/data \
+--exclude=media \
+--exclude=.steam \
 --exclude=.smartgit/updates \
 --exclude=.wine*/*/windows/ \
 --exclude=.googleearth \
 --exclude=*/.Genymobile \
---exclude=*/.config/skypeforlinux/Cache \
 --exclude=*/3D_Model/assets \
 --exclude=private \
 --exclude=MyProgs \
@@ -34,7 +39,6 @@ sudo tar cvpzf "${backup_dir}/$(hostname)_home_backup_$(date +%yy%mm%dd-%Hh%Mm%S
 --exclude=.apt \
 --exclude=.npm \
 .
-
 
 # Удаляем старые архивы
 for i in $delFiles

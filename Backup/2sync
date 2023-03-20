@@ -2,13 +2,14 @@
 
 # Двухсторонняя синхронизация
 # Использование:
-# 2sync src dest
+# ./2sync src dest [opt1] [opt2]
 
 src=$1
 dest=$2
-opt=$3
+opt1=$3
+opt2=$4
 
-rsync -r -t -v $opt --progress -s --omit-dir-times $src $dest
-rsync -r -t -v $opt --progress -s --omit-dir-times $dest $src
+rsync -r -t -v $opt1 $opt2 --progress -s --omit-dir-times $src $dest
+rsync -r -t -v $opt1 $opt2 --progress -s --omit-dir-times $dest $src 
 
 
