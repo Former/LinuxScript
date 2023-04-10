@@ -21,6 +21,8 @@ sudo tar cvpzf "${backup_dir}/$(hostname)_home_backup_$(date +%yy%mm%dd-%Hh%Mm%S
 --exclude=.thumbnails \
 --exclude=.mozilla/firefox/*.*/storage \
 --exclude=*/.cache/* \
+--exclude=*/Загрузки/* \
+--exclude=*/Музыка/* \
 --exclude=.cache \
 --exclude=/.config/chromium/*/CacheStorage \
 --exclude=*/.config/skypeforlinux/Cache \
