@@ -44,6 +44,10 @@ sudo eepm play zoom
 wget https://packages.ntop.org/centos-stable/8/x86_64/Packages/n2n-3.0.0-1044.x86_64.rpm
 sudo apt-get install ./n2n-3.0.0-1044.x86_64.rpm
 
+# rpi
+wget https://packages.ntop.org/RaspberryPI/bullseye_pi/arm64/n2n/n2n_3.1.1-76-g709590d_arm64.deb
+sudo epm -i ./n2n_3.1.1-76-g709590d_arm64.deb
+
 sudo systemctl enable --now edge.service 
 
 git config --global core.editor mcedit
