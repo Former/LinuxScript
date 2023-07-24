@@ -22,21 +22,29 @@ sudo apt-get update
 sudo apt-get dist-upgrade
 sudo update-kernel
 
-sudo apt-get install gimp geany geany-plugins screen gcc icewm idesk \
- dillo links2 smtube vlc mpv mc openssh-server mplayer-gui texstudio \
- volumeicon git ffmpeg remmina xrdp nmap gparted redshift stellarium  \
- minetest widelands sshfs encfs pcmanfm xclip clang gitg gitk git-cola \
- texlive pwgen cheese gxneur xneur audacious deluge  gnome-disk-utility \
- cinnamon-full systemd-settings-disable-kill-user-processes retext \
- firefox xviewer gnome-system-monitor filezilla baobab gedit \
+sudo apt-get install \
+ pwgen xclip audacious pdfmod \
+ gparted testdisk gnome-disk-utility baobab \
+ cpu-x gnome-system-monitor \
+ wol sshfs traceroute encfs openssh-server remmina xrdp nmap deluge filezilla \
+ geany geany-plugins screen git gitg gitk git-cola  \
+ golang sqlite3 nodejs \
+ build-environment ctest gcc-c++ gcc clang \
+ flex libncurses-devel \
+ gimp pinta mypaint xviewer \
+ firefox dillo links2 \
+ vlc smtube mpv mplayer-gui ffmpeg cheese \
+ redshift stellarium \
+ minetest widelands \
+ texlive texstudio \
+ systemd-settings-disable-kill-user-processes \
+ retext gedit \
+ cinnamon-full idesk icewm pcmanfm volumeicon mc \
  nemo nemo-emblems nemo-fileroller \
  nemo-compare nemo-share-common nemo-arronax nemo-preview nemo-python-devel \
  nemo-extensions-translations nemo-translations nemo-terminal nemo-share \
- nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk \
- golang sqlite3 nodejs \
- build-environment ctest gcc-c++ flex libncurses-devel \
- cpu-x pdfmod traceroute testdisk \
- wol
+ nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk
+
 
 sudo eepm play skype
 sudo eepm play telegram
