@@ -38,13 +38,16 @@ sudo apt-get install \
  minetest widelands \
  texlive texstudio \
  systemd-settings-disable-kill-user-processes \
- retext gedit \
+ retext \
+ gedit gedit-plugins gedit-plugins-latex \
  cinnamon-full idesk icewm pcmanfm volumeicon mc \
  nemo nemo-emblems nemo-fileroller \
  nemo-compare nemo-share-common nemo-arronax nemo-preview nemo-python-devel \
  nemo-extensions-translations nemo-translations nemo-terminal nemo-share \
  nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk
 
+# Gedit plugins
+https://github.com/hannenz/duplicate
 
 sudo eepm play skype
 sudo eepm play telegram
