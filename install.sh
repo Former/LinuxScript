@@ -44,7 +44,8 @@ sudo apt-get install \
  nemo nemo-emblems nemo-fileroller \
  nemo-compare nemo-share-common nemo-arronax nemo-preview nemo-python-devel \
  nemo-extensions-translations nemo-translations nemo-terminal nemo-share \
- nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk
+ nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk\
+ nano
 
 # Gedit plugins
 https://github.com/hannenz/duplicate
@@ -94,6 +95,10 @@ hwmon /sys/class/thermal/thermal_zone0/temp
 
 test: sudo /usr/sbin/thinkfan -n
 systemctl enable --now thinkfan.service
+
+# By root:
+EDITOR=nano crontab -e
+@reboot cpupower frequency-set --max 2.3G
 
 # XnConvert
 Download: https://www.xnview.com/en/xnconvert/#downloads
