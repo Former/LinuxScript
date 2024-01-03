@@ -1,0 +1,113 @@
+#!/bin/bash
+# Озвучивание русского текста из файла pdf и сохранение в видео
+# Параметры
+emotion='neutral' #'Default is neutral. Also supported are good (friendly) and evil (angry)'
+speaker='ermil' # (Optional): Speaker voice. Default is zahar. Supported female voices are jane, oksana, alyss, omazh and male voices are zahar and ermil.
+#["oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick","alena","filipp"]
+speed='1.0'
+
+use_half="no" # yes or no
+
+input_pdf_file_name="$1"
+
+page_count=$(pdfinfo "$input_pdf_file_name" | awk '/^Pages:/ {print $2}')
+
+video_file_names_array=()
+
+echo "Всего страниц $page_count"
+
+for ((page=1;page<=${page_count};page++)); do
+    
+    echo "------------------------------------------------"
+    echo "Обрабатываем страницу №$page"
+    
+    page_text_file="${input_pdf_file_name}_${page}.txt"
+    page_image_file="${input_pdf_file_name}_${page}"
+    pdftotext -f $page -l $page "$input_pdf_file_name" "$page_text_file"
+    pdftoppm -f $page -l $page -png -singlefile "$input_pdf_file_name" "$page_image_file"
+
+    page_image_file="${page_image_file}.png"
+
+    ~/txt2mp3_by_yatts "$page_text_file"
+    
+    page_mp3_file="${page_text_file}_yatts.mp3"
+    
+    if [ "$use_half"="yes"]; then
+
+        width=$(identify -format "%w" "$page_image_file")> /dev/null
+        height=$(identify -format "%h" "$page_image_file")> /dev/null
+
+        height_half=$(($height/2))
+        
+        page_image_file_half1="${page_image_file}_half1.png"
+        page_image_file_half2="${page_image_file}_half2.png"
+
+        # format (widthxheight+left+top / wxh+l+t)
+        convert "$page_image_file" -crop ${width}x${height_half}+0+0 "$page_image_file_half1"
+        convert "$page_image_file" -crop ${width}x${height_half}+0+$height_half "$page_image_file_half2"
+
+        audio_length=$(mp3info -p "%S" sample.mp3)
+        audio_length_half=$(($audio_length/2))
+        
+        page_mp3_file_half1="${page_mp3_file}_half1.mp3"
+        page_mp3_file_half2="${page_mp3_file}_half2.mp3"
+        
+        ffmpeg -i "$page_mp3_file" -acodec copy -ss "0" -to "$audio_length_half" "$page_mp3_file_half1"
+        ffmpeg -i "$page_mp3_file" -acodec copy -ss "$audio_length_half" -to "$audio_length" "$page_mp3_file_half2"
+
+        page_mp4_file_half1="${input_pdf_file_name}_${page}_half1.mp4"
+        
+        ffmpeg -loop 1 -i "$page_image_file_half1" -i "$page_mp3_file_half1" -c:v libx264 -tune stillimage -c:a copy -pix_fmt yuv420p -s 1920*1080 -shortest "$page_mp4_file_half1"
+        
+        IFS=""
+        video_file_names_array+=($page_mp4_file_half1)
+
+        page_mp4_file_half2="${input_pdf_file_name}_${page}_half2.mp4"
+        
+        ffmpeg -loop 1 -i "$page_image_file_half2" -i "$page_mp3_file_half2" -c:v libx264 -tune stillimage -c:a copy -pix_fmt yuv420p -s 1920*1080 -shortest "$page_mp4_file_half2"
+        
+        IFS=""
+        video_file_names_array+=($page_mp4_file_half2)
+        
+        rm "$page_mp3_file_half1"
+        rm "$page_mp3_file_half2"
+        rm "$page_image_file_half1"
+        rm "$page_image_file_half2"
+    else
+
+        page_mp4_file="${input_pdf_file_name}_${page}.mp4"
+        
+        ffmpeg -loop 1 -i "$page_image_file" -i "$page_mp3_file" -c:v libx264 -tune stillimage -c:a copy -pix_fmt yuv420p -s 1920*1080 -shortest "$page_mp4_file"
+        
+        IFS=""
+        video_file_names_array+=($page_mp4_file)
+   
+    fi
+    
+    rm "$page_mp3_file"
+    rm "$page_image_file"
+    rm "$page_text_file"
+  
+    
+done
+
+cmd=""
+for ((i = 0; i < ${#video_file_names_array[@]}; i++)) do
+    cmd="$cmd|${video_file_names_array[$i]}"
+done
+cmd=${cmd:1}
+
+out_file="${input_pdf_file_name}.mp4"
+
+echo "Объединяем файлы $cmd в $out_file"
+ffmpeg -i "concat:$cmd" -acodec copy -vcodec copy "$out_file"
+
+IFS=""
+for ((i = 0; i < ${#video_file_names_array[@]}; i++)) do
+    f="${video_file_names_array[$i]}"
+    echo "Удаляем файл '$f'"
+    rm "$f"
+done
+
+echo "Конечный файл создан '$out_file'!"
+
