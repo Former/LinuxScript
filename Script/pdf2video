@@ -5,9 +5,9 @@ emotion='neutral' #'Default is neutral. Also supported are good (friendly) and e
 speaker='ermil' # (Optional): Speaker voice. Default is zahar. Supported female voices are jane, oksana, alyss, omazh and male voices are zahar and ermil.
 #["oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick","alena","filipp"]
 speed='1.0'
-use_half="no" # yes or no
-ffmpeg_pre_options="-loop 1"
-ffmpeg_options="-c:v libx264 -tune stillimage -c:a copy -pix_fmt yuv420p -s 1920*1080 -shortest"
+use_half="yes" # yes or no
+ffmpeg_pre_options="-loop 1 -r 2" # "-loop 1"
+ffmpeg_options="-c:v libx264 -tune stillimage -preset ultrafast -crf 20  -c:a copy -shortest -pix_fmt yuv420p -s 1920*1080"
 
 #----------------------------------------------------
 
@@ -31,11 +31,33 @@ for ((page=1;page<=${page_count};page++)); do
 
     page_image_file="${page_image_file}.png"
 
-    ~/txt2mp3_by_yatts "$page_text_file"
+    if [ "$use_half"="yes" ]; then
     
-    page_mp3_file="${page_text_file}_yatts.mp3"
+        source_text=$(cat "${page_text_file}")
+        
+        space_char=" "
+        split_size=$(( ${#source_text} / 2 ))
+        file_index=0
+        for ((i=1;i<=${#source_text};i++)); do
+            cur_char=${source_text:$i-1:1}
+            cur_text="${cur_text}${cur_char}"
+            if [ "$cur_char" = "$space_char" ] && [ ${#cur_text} -ge $split_size ] || [ $i = ${#source_text} ]; then
+                let file_index+=1
+                
+                echo "$cur_text" > "${page_text_file}_half${file_index}"
+                
+                cur_text=""
+            fi
+        done
+
+        file_mp3_half1="${page_text_file}_half1"
+        file_mp3_half2="${page_text_file}_half2"
+        
+        ~/txt2mp3_by_yatts "${file_mp3_half1}"
+        ~/txt2mp3_by_yatts "${file_mp3_half2}"
     
-    if [ "$use_half"="yes"]; then
+        page_mp3_file_half1="${file_mp3_half1}_yatts.mp3"
+        page_mp3_file_half2="${file_mp3_half2}_yatts.mp3"
 
         width=$(identify -format "%w" "$page_image_file")> /dev/null
         height=$(identify -format "%h" "$page_image_file")> /dev/null
@@ -49,34 +71,37 @@ for ((page=1;page<=${page_count};page++)); do
         convert "$page_image_file" -crop ${width}x${height_half}+0+0 "$page_image_file_half1"
         convert "$page_image_file" -crop ${width}x${height_half}+0+$height_half "$page_image_file_half2"
 
-        audio_length=$(mp3info -p "%S" sample.mp3)
-        audio_length_half=$(($audio_length/2))
-        
-        page_mp3_file_half1="${page_mp3_file}_half1.mp3"
-        page_mp3_file_half2="${page_mp3_file}_half2.mp3"
-        
-        ffmpeg -i "$page_mp3_file" -acodec copy -ss "0" -to "$audio_length_half" "$page_mp3_file_half1"
-        ffmpeg -i "$page_mp3_file" -acodec copy -ss "$audio_length_half" -to "$audio_length" "$page_mp3_file_half2"
-
         page_mp4_file_half1="${input_pdf_file_name}_${page}_half1.mp4"
         
         ffmpeg $ffmpeg_pre_options -i "$page_image_file_half1" -i "$page_mp3_file_half1" $ffmpeg_options "$page_mp4_file_half1"
         
+        SAVE_IFS=$IFS
         IFS=""
         video_file_names_array+=($page_mp4_file_half1)
+        IFS=$SAVE_IFS
 
         page_mp4_file_half2="${input_pdf_file_name}_${page}_half2.mp4"
         
         ffmpeg $ffmpeg_pre_options -i "$page_image_file_half2" -i "$page_mp3_file_half2" $ffmpeg_options "$page_mp4_file_half2"
         
+        SAVE_IFS=$IFS
         IFS=""
         video_file_names_array+=($page_mp4_file_half2)
+        IFS=$SAVE_IFS
         
-        rm "$page_mp3_file_half1"
-        rm "$page_mp3_file_half2"
         rm "$page_image_file_half1"
         rm "$page_image_file_half2"
+        
+        rm "$file_mp3_half1"
+        rm "$file_mp3_half2"
+        rm "$page_mp3_file_half1"
+        rm "$page_mp3_file_half2"
+
     else
+
+        ~/txt2mp3_by_yatts "$page_text_file"
+    
+        page_mp3_file="${page_text_file}_yatts.mp3"
 
         page_mp4_file="${input_pdf_file_name}_${page}.mp4"
         
@@ -85,9 +110,10 @@ for ((page=1;page<=${page_count};page++)); do
         IFS=""
         video_file_names_array+=($page_mp4_file)
    
+        rm "$page_mp3_file"
+
     fi
     
-    rm "$page_mp3_file"
     rm "$page_image_file"
     rm "$page_text_file"
   
