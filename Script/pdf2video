@@ -5,8 +5,11 @@ emotion='neutral' #'Default is neutral. Also supported are good (friendly) and e
 speaker='ermil' # (Optional): Speaker voice. Default is zahar. Supported female voices are jane, oksana, alyss, omazh and male voices are zahar and ermil.
 #["oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick","alena","filipp"]
 speed='1.0'
-
 use_half="no" # yes or no
+ffmpeg_pre_options="-loop 1"
+ffmpeg_options="-c:v libx264 -tune stillimage -c:a copy -pix_fmt yuv420p -s 1920*1080 -shortest"
+
+#----------------------------------------------------
 
 input_pdf_file_name="$1"
 
@@ -57,14 +60,14 @@ for ((page=1;page<=${page_count};page++)); do
 
         page_mp4_file_half1="${input_pdf_file_name}_${page}_half1.mp4"
         
-        ffmpeg -loop 1 -i "$page_image_file_half1" -i "$page_mp3_file_half1" -c:v libx264 -tune stillimage -c:a copy -pix_fmt yuv420p -s 1920*1080 -shortest "$page_mp4_file_half1"
+        ffmpeg $ffmpeg_pre_options -i "$page_image_file_half1" -i "$page_mp3_file_half1" $ffmpeg_options "$page_mp4_file_half1"
         
         IFS=""
         video_file_names_array+=($page_mp4_file_half1)
 
         page_mp4_file_half2="${input_pdf_file_name}_${page}_half2.mp4"
         
-        ffmpeg -loop 1 -i "$page_image_file_half2" -i "$page_mp3_file_half2" -c:v libx264 -tune stillimage -c:a copy -pix_fmt yuv420p -s 1920*1080 -shortest "$page_mp4_file_half2"
+        ffmpeg $ffmpeg_pre_options -i "$page_image_file_half2" -i "$page_mp3_file_half2" $ffmpeg_options "$page_mp4_file_half2"
         
         IFS=""
         video_file_names_array+=($page_mp4_file_half2)
@@ -77,7 +80,7 @@ for ((page=1;page<=${page_count};page++)); do
 
         page_mp4_file="${input_pdf_file_name}_${page}.mp4"
         
-        ffmpeg -loop 1 -i "$page_image_file" -i "$page_mp3_file" -c:v libx264 -tune stillimage -c:a copy -pix_fmt yuv420p -s 1920*1080 -shortest "$page_mp4_file"
+        ffmpeg $ffmpeg_pre_options -i "$page_image_file" -i "$page_mp3_file" $ffmpeg_options "$page_mp4_file"
         
         IFS=""
         video_file_names_array+=($page_mp4_file)
