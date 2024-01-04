@@ -6,16 +6,49 @@ speaker='ermil' # (Optional): Speaker voice. Default is zahar. Supported female 
 #["oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick","alena","filipp"]
 speed='1.0'
 use_half="yes" # yes or no
-ffmpeg_pre_options="-loop 1 -r 2" # "-loop 1"
-ffmpeg_options="-c:v libx264 -tune stillimage -preset ultrafast -crf 20  -c:a copy -shortest -pix_fmt yuv420p -s 1920*1080"
+video_width=1920
+video_height=1080
+ffmpeg_pre_options="-loop 1 -r 2"
+ffmpeg_options="-c:v libx264 -tune stillimage -preset ultrafast -crf 20 -shortest -pix_fmt yuv420p -s ${video_width}*${video_height}"
+minimum_text_on_page=1000
+minimum_time_on_page=5
 
 #----------------------------------------------------
 
 input_pdf_file_name="$1"
 
+out_file="$input_pdf_file_name.mp4"
+
 page_count=$(pdfinfo "$input_pdf_file_name" | awk '/^Pages:/ {print $2}')
 
 video_file_names_array=()
+
+function make_video {
+    local page_image_file=$1
+    local page_mp3_file=$2
+    local page_mp4_file=$3
+
+    local resized_page_image_file="${page_image_file}_resized.png"
+
+    ffmpeg -y -i "${page_image_file}" -vf "scale=${video_width}:${video_height}:force_original_aspect_ratio=decrease,pad=${video_width}:${video_height}:(ow-iw)/2:(oh-ih)/2" "${resized_page_image_file}"
+    
+    local time_play=$(mp3info -p "%S\n" "${page_mp3_file}")
+    local time_opt="-c:a copy"
+    if [ ${minimum_time_on_page} -ge ${time_play} ]; then
+        local add_time=$(( 5 - ${time_play} ))
+        time_opt="-c:a mp3 -af adelay=${add_time}s:all=true" # 
+        echo "time_opt ${time_opt}"
+    fi
+    
+    ffmpeg ${ffmpeg_pre_options} -i "${resized_page_image_file}" -i "${page_mp3_file}" ${ffmpeg_options} ${time_opt} "${page_mp4_file}"
+
+    SAVE_IFS=$IFS
+    IFS=""
+    video_file_names_array+=(${page_mp4_file})
+    IFS=$SAVE_IFS
+    
+    rm "${resized_page_image_file}"
+}
 
 echo "Всего страниц $page_count"
 
@@ -26,14 +59,14 @@ for ((page=1;page<=${page_count};page++)); do
     
     page_text_file="${input_pdf_file_name}_${page}.txt"
     page_image_file="${input_pdf_file_name}_${page}"
-    pdftotext -f $page -l $page "$input_pdf_file_name" "$page_text_file"
-    pdftoppm -f $page -l $page -png -singlefile "$input_pdf_file_name" "$page_image_file"
+    pdftotext -f $page -l $page "${input_pdf_file_name}" "$page_text_file"
+    pdftoppm -r 300 -f $page -l $page -png -singlefile "${input_pdf_file_name}" "$page_image_file"
 
     page_image_file="${page_image_file}.png"
 
-    if [ "$use_half"="yes" ]; then
-    
-        source_text=$(cat "${page_text_file}")
+    source_text=$(cat "${page_text_file}")
+
+    if [ "$use_half"="yes" ] && [ ${#source_text} -ge $minimum_text_on_page ]; then
         
         space_char=" "
         split_size=$(( ${#source_text} / 2 + 2)) # Половина с небольшим запасом
@@ -62,32 +95,21 @@ for ((page=1;page<=${page_count};page++)); do
         width=$(identify -format "%w" "$page_image_file")> /dev/null
         height=$(identify -format "%h" "$page_image_file")> /dev/null
 
-        height_half=$(($height/2))
+        height_half=$(( $height / 2 + $height / 10 ))
         
         page_image_file_half1="${page_image_file}_half1.png"
         page_image_file_half2="${page_image_file}_half2.png"
 
         # format (widthxheight+left+top / wxh+l+t)
         convert "$page_image_file" -crop ${width}x${height_half}+0+0 "$page_image_file_half1"
-        convert "$page_image_file" -crop ${width}x${height_half}+0+$height_half "$page_image_file_half2"
+        convert "$page_image_file" -crop ${width}x${height_half}+0+$(( $height - $height_half )) "$page_image_file_half2"
 
         page_mp4_file_half1="${input_pdf_file_name}_${page}_half1.mp4"
-        
-        ffmpeg $ffmpeg_pre_options -i "$page_image_file_half1" -i "$page_mp3_file_half1" $ffmpeg_options "$page_mp4_file_half1"
-        
-        SAVE_IFS=$IFS
-        IFS=""
-        video_file_names_array+=($page_mp4_file_half1)
-        IFS=$SAVE_IFS
-
         page_mp4_file_half2="${input_pdf_file_name}_${page}_half2.mp4"
         
-        ffmpeg $ffmpeg_pre_options -i "$page_image_file_half2" -i "$page_mp3_file_half2" $ffmpeg_options "$page_mp4_file_half2"
+        make_video "$page_image_file_half1" "$page_mp3_file_half1" "$page_mp4_file_half1"
         
-        SAVE_IFS=$IFS
-        IFS=""
-        video_file_names_array+=($page_mp4_file_half2)
-        IFS=$SAVE_IFS
+        make_video "$page_image_file_half2" "$page_mp3_file_half2" "$page_mp4_file_half2"
         
         rm "$page_image_file_half1"
         rm "$page_image_file_half2"
@@ -98,20 +120,14 @@ for ((page=1;page<=${page_count};page++)); do
         rm "$page_mp3_file_half2"
 
     else
-
         ~/txt2mp3_by_yatts "$page_text_file"
     
         page_mp3_file="${page_text_file}_yatts.mp3"
 
         page_mp4_file="${input_pdf_file_name}_${page}.mp4"
-        
-        ffmpeg $ffmpeg_pre_options -i "$page_image_file" -i "$page_mp3_file" $ffmpeg_options "$page_mp4_file"
-        
-        SAVE_IFS=$IFS
-        IFS=""
-        video_file_names_array+=($page_mp4_file)
-        IFS=$SAVE_IFS
-   
+
+        make_video "$page_image_file" "$page_mp3_file" "$page_mp4_file"
+      
         rm "$page_mp3_file"
 
     fi
@@ -122,23 +138,17 @@ for ((page=1;page<=${page_count};page++)); do
     
 done
 
-cmd=""
-for ((i = 0; i < ${#video_file_names_array[@]}; i++)) do
-    cmd="$cmd|${video_file_names_array[$i]}"
-done
-cmd=${cmd:1}
-
-out_file="${input_pdf_file_name}.mp4"
-
-echo "Объединяем файлы $cmd в $out_file"
-ffmpeg -i "concat:$cmd" -acodec copy -vcodec copy "$out_file"
-
+SAVE_IFS=$IFS
 IFS=""
+echo "Объединяем файлы ${video_file_names_array[*]} в $out_file"
+ffmpeg -f concat -safe 0 -i <(for ((i = 0; i < ${#video_file_names_array[@]}; i++)) do echo "file '$PWD/${video_file_names_array[$i]}'"; done) -acodec copy -vcodec copy "$out_file"
+
 for ((i = 0; i < ${#video_file_names_array[@]}; i++)) do
     f="${video_file_names_array[$i]}"
     echo "Удаляем файл '$f'"
     rm "$f"
 done
+IFS=$SAVE_IFS
 
 echo "Конечный файл создан '$out_file'!"
 

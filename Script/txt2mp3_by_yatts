@@ -5,72 +5,92 @@ emotion='neutral' #'Default is neutral. Also supported are good (friendly) and e
 speaker='ermil' # (Optional): Speaker voice. Default is zahar. Supported female voices are jane, oksana, alyss, omazh and male voices are zahar and ermil.
 #["oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick","alena","filipp"]
 speed='1.0'
+verbose=true
+ffmpeg_opt=""
 
 # https://stackoverflow.com/questions/16483119/an-example-of-how-to-use-getopts-in-bash
 
 input_file_name="$1"
+out_file="${input_file_name}_yatts.mp3"
 
 source_text=$(cat "${input_file_name}")
 
-# Удаляем все пробелы в начале и в конце строк и заменяем два и более пробелов на один
-source_text="$(echo -n "$source_text" | sed 's/^ *//;s/[ ^]*$//;s/  */ /g')"
+# Удаляем все пробелы в начале и в конце строк и заменяем два и более пробелов на один, удаляем все непечатаемые символы
+source_text="$(echo "${source_text//[$'\t\r\n']}" | sed 's/^ *//;s/[ ^]*$//;s/  */ /;s/[^[:blank:][:print:]]//g')"
 
-#echo "Исходный текст $source_text"
+#[ $verbose ] && echo "Исходный текст $source_text" >> "out.txt"
 
 ping -c 3 ya.ru &>/dev/null || { echo "Интернет недоступен."; exit; }
-
-audio_file_names_array=()
 
 split_size=1450
 echo "Длина текста ${#source_text}: Разбиваем на части по $split_size"
 
+txt_array=()
+
 space_char=" "
-file_index=0
 for ((i=1;i<=${#source_text};i++)); do
     cur_char=${source_text:$i-1:1}
     cur_text="${cur_text}${cur_char}"
     if [ "$cur_char" = "$space_char" ] && [ ${#cur_text} -ge $split_size ] || [ $i = ${#source_text} ]; then
 
-        let file_index+=1
-        echo "Часть номер $file_index"
-        echo "------------------------------"
-        echo $cur_text
-        echo "------------------------------"
-
         # Максимальная длина SEND_IRI - 1590 символов, длина SEND_IRI без текста = 75 символов
         # Максимальная длина текста = 1590 - 75 = 1515 символов
-        text_count=$(echo "$cur_text" | wc -m)
+        text_count=${#cur_text}
         [ $text_count -ge 1515 ] && { echo "Превышено максимальное колличество символов - 1515"; exit; }
-        
-        audio_file_name="${input_file_name}_${file_index}.mp3"
-        echo -en "\nЗагрузка аудио в файл '$audio_file_name'...\n"
-        #touch "$audio_file_name"
-        wget -q -O "$audio_file_name" "http://tts.voicetech.yandex.net/tts?format=mp3&quality=hi&lang=ru_RU&speed=$speed&speaker=$speaker&emotion=$emotion&text=${cur_text}" || { echo "Ошибка при загрузке аудио."; exit; }
-        echo "Файл '$audio_file_name' загружен."
         
         SAVE_IFS=$IFS
         IFS=""
-        audio_file_names_array+=($audio_file_name)
+        txt_array+=($cur_text)
         IFS=$SAVE_IFS
 
         cur_text=""
     fi
 done
 
-out_file="${input_file_name}_yatts.mp3"
+audio_file_names_array=()
+
+[ ${#txt_array[@]} -le 0 ] && { txt_array+="."; }
 
 SAVE_IFS=$IFS
 IFS=""
-echo "Объединяем файлы ${audio_file_names_array[*]} в $out_file"
-ffmpeg -f concat -safe 0 -i <(for ((i = 0; i < ${#audio_file_names_array[@]}; i++)) do echo "file '$PWD/${audio_file_names_array[$i]}'"; done) -acodec copy "$out_file"
+file_index=0
+for ((i = 0; i < ${#txt_array[@]}; i++)) do
+    cur_text="${txt_array[$i]}"
+
+    let file_index+=1
+    [ $verbose ] && echo "Часть номер $file_index"
+    [ $verbose ] && echo "------------------------------"
+    [ $verbose ] && echo $cur_text
+    [ $verbose ] && echo "------------------------------"
+
+    #[ $verbose ] && echo $cur_text >> "out.txt"
+
+    audio_file_name="${input_file_name}_${file_index}.mp3"
+    
+    [ $verbose ] && echo -en "\nЗагрузка аудио в файл '$audio_file_name'...\n"
+    
+    #touch "$audio_file_name"
+    wget -q -O "$audio_file_name" "http://tts.voicetech.yandex.net/tts?format=mp3&quality=hi&lang=ru_RU&speed=${speed}&speaker=${speaker}&emotion=${emotion}&text=${cur_text}" || { echo "Ошибка при загрузке аудио."; exit; }
+    
+    [ $verbose ] && echo "Файл '$audio_file_name' загружен."
+    
+    SAVE_IFS=$IFS
+    IFS=""
+    audio_file_names_array+=($audio_file_name)
+    IFS=$SAVE_IFS
+done
+
+[ $verbose ] && echo "Объединяем файлы ${audio_file_names_array[*]} в $out_file"
+
+ffmpeg -f concat -safe 0 -i <(for ((i = 0; i < ${#audio_file_names_array[@]}; i++)) do echo "file '$PWD/${audio_file_names_array[$i]}'"; done) -acodec copy -vcodec copy ${ffmpeg_opt} "$out_file"
 
 for ((i = 0; i < ${#audio_file_names_array[@]}; i++)) do
     f="${audio_file_names_array[$i]}"
-    echo "Удаляем файл '$f'"
+    [ $verbose ] && echo "Удаляем файл '$f'"
     rm "$f"
 done
 IFS=$SAVE_IFS
 
-echo "Конечный файл создан '$out_file'!"
+[ $verbose ] && echo "Конечный файл создан '$out_file'!"
 
 
