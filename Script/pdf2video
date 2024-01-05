@@ -95,7 +95,7 @@ for ((page=1;page<=${page_count};page++)); do
         width=$(identify -format "%w" "$page_image_file")> /dev/null
         height=$(identify -format "%h" "$page_image_file")> /dev/null
 
-        height_half=$(( $height / 2 + $height / 10 ))
+        height_half=$(( $height / 2 + $height / 20 ))
         
         page_image_file_half1="${page_image_file}_half1.png"
         page_image_file_half2="${page_image_file}_half2.png"

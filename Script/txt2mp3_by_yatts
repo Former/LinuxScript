@@ -1,19 +1,117 @@
 #!/bin/bash
-# Озвучивание русского текста из файла
-# Параметры
-emotion='neutral' #'Default is neutral. Also supported are good (friendly) and evil (angry)'
-speaker='ermil' # (Optional): Speaker voice. Default is zahar. Supported female voices are jane, oksana, alyss, omazh and male voices are zahar and ermil.
-#["oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick","alena","filipp"]
+# Общественное достояние, 2024, Алексей Безбородов (Alexei Bezborodov) <AlexeiBv+mirocod_txt2mp3@narod.ru> 
+
+# Озвучивание текста из файла 
+
+# Параметры по умолчанию
+emotion='neutral'
+speaker='ermil'
 speed='1.0'
-verbose=true
+verbose=
 ffmpeg_opt=""
+version=1.0
+input_file=""
+out_file=""
+format="mp3"
+quality="hi"
+lang="ru_RU"
 
-# https://stackoverflow.com/questions/16483119/an-example-of-how-to-use-getopts-in-bash
+ShowHelp() {
+cat << EOF  
+Использование: txt2mp3 -i <text_file> [-o <mp3_file>] [-hV]
+Озвучивание текста
 
-input_file_name="$1"
-out_file="${input_file_name}_yatts.mp3"
+-h, -help,          --help                  Посмотреть помощь.
+-v, -version,       --version               Посмотреть версию программы.
+-i, -input,         --input                 Входной текстовый файл.
+-o, -output,        --output                Выходной файл звуковой.
+-e, -emotion,       --emotion               Эмоциональный настрой говорящего. Может принимать значения "neutral", "good", "evil". По умолчанию "$emotion".
+-s, -speaker,       --speaker               Голос говорящего. Может принимать значения "oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick". По умолчанию "$speaker".
+-S, -speed,         --speed                 Скорость озвучки. По умолчанию "$speed".
+-O, -ffmpeg_opt,    --ffmpeg_opt            Дополнительные параметры ffmpeg.
+-f, -format,        --format                Выходной формат. Может быть либо "mp3", либо "wav". По умолчанию "$format".
+-q, -quality,       --quality               Качество выходного файла. Может быть либо "hi", либо "lo". По умолчанию "$quality".
+-l, -lang,          --lang                  Язык озвучки. По умолчанию "$lang".
+-V, -verbose,       --verbose               Подробный вывод.
+EOF
+}
 
-source_text=$(cat "${input_file_name}")
+# $@ is all command line parameters passed to the script.
+# -o is for short options like -v
+# -l is for long options with double dash like --version
+# the comma separates different long options
+# -a is for long options with single dash like -version
+# Example
+# 'h' is a no-value option.
+# 'v:' implies that option -v has value and is a mandatory option. ':' means has a value.
+# 't::' implies that option -t has value but is optional. '::' means optional.
+
+
+options=$(getopt --long "help,version,verbose,input:,output:,emotion:,speaker:,speed:,ffmpeg_opt:,format:,quality:,lang:" -o "hvVi:o:e:s:S:O:f:q:l:" -a -- "$@")
+
+# set --:
+# If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters 
+# are set to the arguments, even if some of them begin with a ‘-’.
+eval set -- "$options"
+
+while true
+do
+case "$1" in
+-h|--help) 
+    ShowHelp
+    exit
+    ;;
+-v|--version) 
+    echo $version
+    exit
+    ;;
+-V|--verbose)
+    verbose=true
+    ;;
+-i|--input)
+    input_file="$2"
+    ;;
+-o|--output)
+    out_file="$2"
+    ;;
+-e|--emotion)
+    emotion="$2"
+    ;;
+-s|--speaker)
+    speaker="$2"
+    ;;
+-S|--speed)
+    speed="$2"
+    ;;
+-O|--ffmpeg_opt)
+    ffmpeg_opt="$2"
+    ;;
+-f|--format)
+    format="$2"
+    ;;
+-q|--quality)
+    quality="$2"
+    ;;
+-l|--lang)
+    lang="$2"
+    ;;
+--)
+    shift
+    break;;
+esac
+shift
+done
+
+unuse_param="$*"
+if [ "${input_file}" = "" ] || [ "$unuse_param" != "" ]; then
+    [ "$unuse_param" != "" ] && echo "Параметры не расшифрованы \"$unuse_param\"" 
+    ShowHelp
+    exit
+fi
+
+[ "$out_file" = "" ] && { out_file="$input_file.mp3"; [ $verbose ] && echo "Выходное имя файла \"$out_file\""; }
+
+source_text=$(cat "${input_file}")
 
 # Удаляем все пробелы в начале и в конце строк и заменяем два и более пробелов на один, удаляем все непечатаемые символы
 source_text="$(echo "${source_text//[$'\t\r\n']}" | sed 's/^ *//;s/[ ^]*$//;s/  */ /;s/[^[:blank:][:print:]]//g')"
@@ -23,7 +121,7 @@ source_text="$(echo "${source_text//[$'\t\r\n']}" | sed 's/^ *//;s/[ ^]*$//;s/  
 ping -c 3 ya.ru &>/dev/null || { echo "Интернет недоступен."; exit; }
 
 split_size=1450
-echo "Длина текста ${#source_text}: Разбиваем на части по $split_size"
+[ $verbose ] && echo "Длина текста ${#source_text}: Разбиваем на части по $split_size"
 
 txt_array=()
 
@@ -49,6 +147,7 @@ done
 
 audio_file_names_array=()
 
+# Если текст пустой, то всё равно создаём выходной файл
 [ ${#txt_array[@]} -le 0 ] && { txt_array+="."; }
 
 SAVE_IFS=$IFS
@@ -65,7 +164,7 @@ for ((i = 0; i < ${#txt_array[@]}; i++)) do
 
     #[ $verbose ] && echo $cur_text >> "out.txt"
 
-    audio_file_name="${input_file_name}_${file_index}.mp3"
+    audio_file_name="${input_file}_${file_index}.mp3"
     
     [ $verbose ] && echo -en "\nЗагрузка аудио в файл '$audio_file_name'...\n"
     
