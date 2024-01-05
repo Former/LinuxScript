@@ -5,7 +5,7 @@
 
 # Параметры по умолчанию
 emotion='neutral'
-speaker='ermil'
+speaker='erkanyavas'
 speed='1.0'
 verbose=
 ffmpeg_opt=""

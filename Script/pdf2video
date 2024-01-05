@@ -1,27 +1,170 @@
 #!/bin/bash
+# Общественное достояние, 2024, Алексей Безбородов (Alexei Bezborodov) <AlexeiBv+mirocod_pdf2video@narod.ru> 
+
 # Озвучивание русского текста из файла pdf и сохранение в видео
-# Параметры
-emotion='neutral' #'Default is neutral. Also supported are good (friendly) and evil (angry)'
-speaker='ermil' # (Optional): Speaker voice. Default is zahar. Supported female voices are jane, oksana, alyss, omazh and male voices are zahar and ermil.
-#["oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick","alena","filipp"]
+
+# Параметры по умолчанию
+emotion='neutral'
+speaker='erkanyavas'
 speed='1.0'
-use_half="yes" # yes or no
+verbose=
+ffmpeg_opt=""
+version=1.0
+input_file=""
+out_file=""
+format="mp3"
+quality="hi"
+lang="ru_RU"
+
+half="yes"
 video_width=1920
 video_height=1080
 ffmpeg_pre_options="-loop 1 -r 2"
-ffmpeg_options="-c:v libx264 -tune stillimage -preset ultrafast -crf 20 -shortest -pix_fmt yuv420p -s ${video_width}*${video_height}"
+ffmpeg_options="-c:v libx264 -tune stillimage -preset ultrafast -crf 20 -shortest -pix_fmt yuv420p"
 minimum_text_on_page=1000
 minimum_time_on_page=5
+page_range=""
+
+ShowHelp() {
+cat << EOF  
+Использование: pdf2video -i <text_file> [-o <mp4_file>] [-hV]
+Озвучивание текста
+
+Общие параметры
+-h, -help,          --help                  Посмотреть помощь.
+-v, -version,       --version               Посмотреть версию программы.
+-V, -verbose,       --verbose               Подробный вывод.
+
+Параметры звука
+-i, -input,         --input                 Входной текстовый файл.
+-o, -output,        --output                Выходной файл звуковой.
+-e, -emotion,       --emotion               Эмоциональный настрой говорящего. Может принимать значения "neutral", "good", "evil". По умолчанию "$emotion".
+-s, -speaker,       --speaker               Голос говорящего. Может принимать значения "oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick". По умолчанию "$speaker".
+-S, -speed,         --speed                 Скорость озвучки. По умолчанию "$speed".
+-O, -ffmpeg_opt,    --ffmpeg_opt            Дополнительные параметры ffmpeg.
+-f, -format,        --format                Выходной формат. Может быть либо "mp3", либо "wav". По умолчанию "$format".
+-q, -quality,       --quality               Качество выходного файла. Может быть либо "hi", либо "lo". По умолчанию "$quality".
+-l, -lang,          --lang                  Язык озвучки. По умолчанию "$lang".
+
+Параметры видео
+-k, -half,          --half                  Деление страницы пополам. Может быть либо "yes", либо "no". По умолчанию "$half".
+-W, -video_width,   --video_width           Размер видео в пикселях по ширине. По умолчанию "$video_width".
+-H, -video_height,  --video_height          Размер видео в пикселях по высоте. По умолчанию "$video_height".
+-p, -ffmpeg_pre_options, --ffmpeg_pre_options
+                                            Опции ffmpeg в самом начале. По умолчанию "$ffmpeg_pre_options".
+-P, -ffmpeg_options, --ffmpeg_options       Опции ffmpeg. По умолчанию "$ffmpeg_options".
+-r, -page_range,    --page_range            Указывает страницы из выходного файла для обработки. Пример "{1..32}", "{2..10..2}", "\$(seq 5 3 30)"
+
+EOF
+}
+
+# $@ is all command line parameters passed to the script.
+# -o is for short options like -v
+# -l is for long options with double dash like --version
+# the comma separates different long options
+# -a is for long options with single dash like -version
+# Example
+# 'h' is a no-value option.
+# 'v:' implies that option -v has value and is a mandatory option. ':' means has a value.
+# 't::' implies that option -t has value but is optional. '::' means optional.
+
+
+options=$(getopt --long "help,version,verbose,input:,output:,emotion:,speaker:,speed:,ffmpeg_opt:,format:,quality:,lang:,half:,video_width:,video_height:, ffmpeg_pre_options:,ffmpeg_options:,page_range:" -o "hvVi:o:e:s:S:O:f:q:l:k:W:H:p:P:r:" -a -- "$@")
+
+# set --:
+# If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters 
+# are set to the arguments, even if some of them begin with a ‘-’.
+eval set -- "$options"
+
+while true
+do
+case "$1" in
+-h|--help) 
+    ShowHelp
+    exit
+    ;;
+-v|--version) 
+    echo $version
+    exit
+    ;;
+-V|--verbose)
+    verbose=true
+    ;;
+-i|--input)
+    input_file="$2"
+    ;;
+-o|--output)
+    out_file="$2"
+    ;;
+-e|--emotion)
+    emotion="$2"
+    ;;
+-s|--speaker)
+    speaker="$2"
+    ;;
+-S|--speed)
+    speed="$2"
+    ;;
+-O|--ffmpeg_opt)
+    ffmpeg_opt="$2"
+    ;;
+-f|--format)
+    format="$2"
+    ;;
+-q|--quality)
+    quality="$2"
+    ;;
+-l|--lang)
+    lang="$2"
+    ;;
+-H|--half)
+    half="$2"
+    ;;
+-W|--video_width)
+    video_width="$2"
+    ;;
+-H|--video_height)
+    video_height="$2"
+    ;;
+-p|--ffmpeg_pre_options)
+    ffmpeg_pre_options="$2"
+    ;;
+-P|--ffmpeg_options)
+    ffmpeg_options="$2"
+    ;;
+-r|--page_range)
+    page_range="$2"
+    ;;
+--)
+    shift
+    break;;
+esac
+shift
+done
+
+unuse_param="$*"
+if [ "${input_file}" = "" ] || [ "${unuse_param}" != "" ]; then
+    [ "${unuse_param}" != "" ] && echo "Параметры не расшифрованы \"$unuse_param\"" 
+    ShowHelp
+    exit
+fi
+
+[ "$out_file" = "" ] && { out_file="${input_file}.mp4"; [ $verbose ] && echo "Выходное имя файла \"$out_file\""; }
 
 #----------------------------------------------------
 
-input_pdf_file_name="$1"
-
-out_file="$input_pdf_file_name.mp4"
-
-page_count=$(pdfinfo "$input_pdf_file_name" | awk '/^Pages:/ {print $2}')
+page_count=$(pdfinfo "${input_file}" | awk '/^Pages:/ {print $2}')
 
 video_file_names_array=()
+
+function Text2mp3 {
+    local text_file=$1
+    local mp3_file=$2
+    verb=""
+    [ $verbose ] && verb="-V"
+
+    ~/txt2mp3 -i "$text_file" -o "$mp3_file" -e $emotion -s $speaker -S $speed -f $format -q $quality -l $lang $verb
+}
 
 function make_video {
     local page_image_file=$1
@@ -31,7 +174,7 @@ function make_video {
     local resized_page_image_file="${page_image_file}_resized.png"
 
     ffmpeg -y -i "${page_image_file}" -vf "scale=${video_width}:${video_height}:force_original_aspect_ratio=decrease,pad=${video_width}:${video_height}:(ow-iw)/2:(oh-ih)/2" "${resized_page_image_file}"
-    
+
     local time_play=$(mp3info -p "%S\n" "${page_mp3_file}")
     local time_opt="-c:a copy"
     if [ ${minimum_time_on_page} -ge ${time_play} ]; then
@@ -39,35 +182,51 @@ function make_video {
         time_opt="-c:a mp3 -af adelay=${add_time}s:all=true" # 
         echo "time_opt ${time_opt}"
     fi
-    
+
     ffmpeg ${ffmpeg_pre_options} -i "${resized_page_image_file}" -i "${page_mp3_file}" ${ffmpeg_options} ${time_opt} "${page_mp4_file}"
 
     SAVE_IFS=$IFS
     IFS=""
     video_file_names_array+=(${page_mp4_file})
     IFS=$SAVE_IFS
-    
+
     rm "${resized_page_image_file}"
 }
 
-echo "Всего страниц $page_count"
+[ $verbose ] && echo "Всего страниц $page_count"
 
 for ((page=1;page<=${page_count};page++)); do
-    
-    echo "------------------------------------------------"
-    echo "Обрабатываем страницу №$page"
-    
-    page_text_file="${input_pdf_file_name}_${page}.txt"
-    page_image_file="${input_pdf_file_name}_${page}"
-    pdftotext -f $page -l $page "${input_pdf_file_name}" "$page_text_file"
-    pdftoppm -r 300 -f $page -l $page -png -singlefile "${input_pdf_file_name}" "$page_image_file"
+
+    if [ $page_range ]; then
+        skip="true"
+        for p in $(eval echo "$page_range"); 
+        do 
+            if [ $p = $page ]; then 
+            skip="false"
+            break
+            fi
+        done
+
+        if [ $skip = "true" ]; then
+            [ $verbose ] && echo "Пропускаем страницу №$page"
+            continue
+        fi
+    fi
+
+    [ $verbose ] && echo "------------------------------------------------"
+    [ $verbose ] && echo "Обрабатываем страницу №$page"
+
+    page_text_file="${input_file}_${page}.txt"
+    page_image_file="${input_file}_${page}"
+    pdftotext -f $page -l $page "${input_file}" "$page_text_file"
+    pdftoppm -r 300 -f $page -l $page -png -singlefile "${input_file}" "$page_image_file"
 
     page_image_file="${page_image_file}.png"
 
     source_text=$(cat "${page_text_file}")
 
-    if [ "$use_half"="yes" ] && [ ${#source_text} -ge $minimum_text_on_page ]; then
-        
+    if [ "$half"="yes" ] && [ ${#source_text} -ge $minimum_text_on_page ]; then
+
         space_char=" "
         split_size=$(( ${#source_text} / 2 + 2)) # Половина с небольшим запасом
         file_index=0
@@ -76,27 +235,27 @@ for ((page=1;page<=${page_count};page++)); do
             cur_text="${cur_text}${cur_char}"
             if [ "$cur_char" = "$space_char" ] && [ ${#cur_text} -ge $split_size ] || [ $i = ${#source_text} ]; then
                 let file_index+=1
-                
+
                 echo "$cur_text" > "${page_text_file}_half${file_index}"
-                
+
                 cur_text=""
             fi
         done
 
-        file_mp3_half1="${page_text_file}_half1"
-        file_mp3_half2="${page_text_file}_half2"
-        
-        ~/txt2mp3_by_yatts "${file_mp3_half1}"
-        ~/txt2mp3_by_yatts "${file_mp3_half2}"
-    
-        page_mp3_file_half1="${file_mp3_half1}_yatts.mp3"
-        page_mp3_file_half2="${file_mp3_half2}_yatts.mp3"
+        file_txt_half1="${page_text_file}_half1"
+        file_txt_half2="${page_text_file}_half2"
+  
+        page_mp3_file_half1="${file_txt_half1}.mp3"
+        page_mp3_file_half2="${file_txt_half2}.mp3"
+
+        Text2mp3 "$file_txt_half1" "$page_mp3_file_half1"
+        Text2mp3 "$file_txt_half2" "$page_mp3_file_half2"
 
         width=$(identify -format "%w" "$page_image_file")> /dev/null
         height=$(identify -format "%h" "$page_image_file")> /dev/null
 
         height_half=$(( $height / 2 + $height / 20 ))
-        
+
         page_image_file_half1="${page_image_file}_half1.png"
         page_image_file_half2="${page_image_file}_half2.png"
 
@@ -104,27 +263,27 @@ for ((page=1;page<=${page_count};page++)); do
         convert "$page_image_file" -crop ${width}x${height_half}+0+0 "$page_image_file_half1"
         convert "$page_image_file" -crop ${width}x${height_half}+0+$(( $height - $height_half )) "$page_image_file_half2"
 
-        page_mp4_file_half1="${input_pdf_file_name}_${page}_half1.mp4"
-        page_mp4_file_half2="${input_pdf_file_name}_${page}_half2.mp4"
-        
+        page_mp4_file_half1="${input_file}_${page}_half1.mp4"
+        page_mp4_file_half2="${input_file}_${page}_half2.mp4"
+
         make_video "$page_image_file_half1" "$page_mp3_file_half1" "$page_mp4_file_half1"
-        
+
         make_video "$page_image_file_half2" "$page_mp3_file_half2" "$page_mp4_file_half2"
-        
+
         rm "$page_image_file_half1"
         rm "$page_image_file_half2"
-        
-        rm "$file_mp3_half1"
-        rm "$file_mp3_half2"
+
+        rm "$file_txt_half1"
+        rm "$file_txt_half2"
         rm "$page_mp3_file_half1"
         rm "$page_mp3_file_half2"
 
     else
-        ~/txt2mp3_by_yatts "$page_text_file"
-    
-        page_mp3_file="${page_text_file}_yatts.mp3"
+        page_mp3_file="${page_text_file}.mp3"
 
-        page_mp4_file="${input_pdf_file_name}_${page}.mp4"
+        Text2mp3 "$page_text_file" "$page_mp3_file"
+
+        page_mp4_file="${input_file}_${page}.mp4"
 
         make_video "$page_image_file" "$page_mp3_file" "$page_mp4_file"
       
@@ -140,15 +299,15 @@ done
 
 SAVE_IFS=$IFS
 IFS=""
-echo "Объединяем файлы ${video_file_names_array[*]} в $out_file"
+[ $verbose ] && echo "Объединяем файлы ${video_file_names_array[*]} в $out_file"
 ffmpeg -f concat -safe 0 -i <(for ((i = 0; i < ${#video_file_names_array[@]}; i++)) do echo "file '$PWD/${video_file_names_array[$i]}'"; done) -acodec copy -vcodec copy "$out_file"
 
 for ((i = 0; i < ${#video_file_names_array[@]}; i++)) do
     f="${video_file_names_array[$i]}"
-    echo "Удаляем файл '$f'"
+    [ $verbose ] && echo "Удаляем файл '$f'"
     rm "$f"
 done
 IFS=$SAVE_IFS
 
-echo "Конечный файл создан '$out_file'!"
+[ $verbose ] && echo "Конечный файл создан '$out_file'!"
 

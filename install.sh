@@ -39,7 +39,7 @@ sudo apt-get install \
  texlive texstudio \
  systemd-settings-disable-kill-user-processes \
  retext \
- gedit gedit-plugins gedit-plugins-latex \
+ gedit gedit-plugins gedit-plugin-devhelp gedit-plugins-latex \
  cinnamon-full idesk icewm pcmanfm volumeicon mc \
  nemo nemo-emblems nemo-fileroller \
  nemo-compare nemo-share-common nemo-arronax nemo-preview nemo-python-devel \
