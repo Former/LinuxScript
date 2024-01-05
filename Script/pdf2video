@@ -3,58 +3,131 @@
 
 # Озвучивание русского текста из файла pdf и сохранение в видео
 
-# Параметры по умолчанию
-emotion='neutral'
-speaker='erkanyavas'
-speed='1.0'
-verbose=
-ffmpeg_opt=""
 version=1.0
-input_file=""
-out_file=""
-format="mp3"
-quality="hi"
-lang="ru_RU"
 
-half="yes"
-video_width=1920
-video_height=1080
-ffmpeg_pre_options="-loop 1 -r 2"
-ffmpeg_options="-c:v libx264 -tune stillimage -preset ultrafast -crf 20 -shortest -pix_fmt yuv420p"
-minimum_text_on_page=1000
-minimum_time_on_page=5
-page_range=""
+# Формат:
+# "Однобуквенная комманда|Расширенная комманда|Справка|Параметр|Значение по умолчанию|Команда на исполнение"
+# Параметр: Пусто - нет параметров, : - есть параметр, :: - параметр не обязателен
 
-ShowHelp() {
+common_params=(
+    "h|help|Посмотреть помощь.|||ShowHelp; exit;"
+    "v|version|Посмотреть версию программы.|||echo \$version; exit;"
+    "V|verbose|Подробный вывод.|||verbose=true"
+#    "|||||"
+    )
+
+sound_params=(
+    "i|input|Входной текстовый файл.|:||"
+    "e|emotion|Эмоциональный настрой говорящего. Может принимать значения 'neutral', 'good', 'evil'. По умолчанию '!DEFAULT!'.|:|'neutral'|"
+    "s|speaker|Голос говорящего. Может принимать значения 'oksana','jane','omazh','zahar','ermil','silaerkan','erkanyavas','alyss', 'nick'. По умолчанию '!DEFAULT!'.|:|'erkanyavas'|"
+    "S|speed|Скорость озвучки. По умолчанию '!DEFAULT!'.|:|'1.0'|"
+    "O|ffmpeg_opt|Дополнительные параметры ffmpeg.|:|''|"
+    "f|format|Выходной формат. Может быть либо 'mp3', либо 'wav'. По умолчанию '!DEFAULT!'.|:|'mp3'|"
+    "q|quality|Качество выходного файла. Может быть либо 'hi', либо 'lo'. По умолчанию '!DEFAULT!'.|:|'hi'|"
+    "l|lang|Язык озвучки. По умолчанию '!DEFAULT!'.|:|'ru_RU'|"
+#    "|||:||"
+    )
+
+video_params=(
+    "o|output|Выходной видео файл.|:|''|"
+    "k|split|Деление страницы пополам. Может быть либо 'yes', либо 'no'. По умолчанию '!DEFAULT!'.|:|'yes'|"
+    "W|video_width|Размер видео в пикселях по ширине. По умолчанию '!DEFAULT!'.|:|1920|"
+    "H|video_height|Размер видео в пикселях по высоте. По умолчанию '!DEFAULT!'.|:|1080|"
+    "p|ffmpeg_pre_options|Опции ffmpeg в самом начале. По умолчанию '!DEFAULT!'.|:|'-loop 1 -r 2'|"
+    "P|ffmpeg_options|Опции ffmpeg. По умолчанию '!DEFAULT!'.|:|'-c:v libx264 -tune stillimage -preset ultrafast -crf 20 -shortest -pix_fmt yuv420p'|"
+    "r|page_range|Указывает страницы из выходного файла для обработки. Пример '{1..32}', '{2..10..2}', '\$(seq 5 3 30)'|:|''|"
+    "m|minimum_text_on_page|Минимальное количество символов на странице при котором происходит разделение страницы на две. По умолчанию '!DEFAULT!'.|:|1000|"
+#    "|||:||"
+    )
+
+all_params=("${common_params[@]}" "${sound_params[@]}" "${video_params[@]}")
+
+function ProcessParams {
+    local iparams=$1[@]
+    local work_func=$2
+    local params=("${!iparams}")
+    local custom_arg1="$3"
+    local custom_arg2="$4"
+
+    SAVE_IFS=$IFS
+    IFS=""
+
+    for (( i=0; i< ${#params[*]}; i++))
+    do
+        p="${params[i]}"
+        readarray -d "|" -t cur_params <<< "$p"
+        small_cmd="${cur_params[0]}"
+        large_cmd="${cur_params[1]}"
+        comment="${cur_params[2]}"
+        use_param="${cur_params[3]}"
+        default="${cur_params[4]}"
+        custom_cmd="${cur_params[5]}"
+
+        $work_func "$small_cmd" "$large_cmd" "$comment" "$use_param" "$default" "$custom_cmd"  "$custom_arg1" "$custom_arg2"
+    done
+
+    IFS=$SAVE_IFS
+}
+
+function Params2InitVar {
+    local small_cmd="$1"
+    local large_cmd="$2"
+    local comment="$3"
+    local use_param="$4"
+    local default="$5"
+    local custom_cmd="$6"
+    if [ "$use_param" != '' ]; then
+        eval "${large_cmd}=${default}"
+    fi
+}
+
+function Params2Help {
+    local small_cmd="$1"
+    local large_cmd="$2"
+    local comment="$3"
+    local use_param="$4"
+    local default="$5"
+    local custom_cmd="$6"
+    echo "-${small_cmd}, -${large_cmd}, --${large_cmd}"
+    echo "        ${comment/"!DEFAULT!"/"${!large_cmd}"}"
+}
+
+function Params2small_list {
+    local small_cmd="$1"
+    local large_cmd="$2"
+    local comment="$3"
+    local use_param="$4"
+    local default="$5"
+    local custom_cmd="$6"
+    echo -n "${small_cmd}${use_param}"
+}
+
+function Params2large_list {
+    local small_cmd="$1"
+    local large_cmd="$2"
+    local comment="$3"
+    local use_param="$4"
+    local default="$5"
+    local custom_cmd="$6"
+    echo -n ",${large_cmd}${use_param}"
+}
+
+# Инициализация переменных
+ProcessParams all_params Params2InitVar
+
+function ShowHelp() {
 cat << EOF  
 Использование: pdf2video -i <text_file> [-o <mp4_file>] [-hV]
-Озвучивание текста
+Озвучивание русского текста из файла pdf и сохранение в видео
 
 Общие параметры
--h, -help,          --help                  Посмотреть помощь.
--v, -version,       --version               Посмотреть версию программы.
--V, -verbose,       --verbose               Подробный вывод.
+$(ProcessParams common_params Params2Help)
 
 Параметры звука
--i, -input,         --input                 Входной текстовый файл.
--o, -output,        --output                Выходной файл звуковой.
--e, -emotion,       --emotion               Эмоциональный настрой говорящего. Может принимать значения "neutral", "good", "evil". По умолчанию "$emotion".
--s, -speaker,       --speaker               Голос говорящего. Может принимать значения "oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick". По умолчанию "$speaker".
--S, -speed,         --speed                 Скорость озвучки. По умолчанию "$speed".
--O, -ffmpeg_opt,    --ffmpeg_opt            Дополнительные параметры ffmpeg.
--f, -format,        --format                Выходной формат. Может быть либо "mp3", либо "wav". По умолчанию "$format".
--q, -quality,       --quality               Качество выходного файла. Может быть либо "hi", либо "lo". По умолчанию "$quality".
--l, -lang,          --lang                  Язык озвучки. По умолчанию "$lang".
+$(ProcessParams sound_params Params2Help)
 
 Параметры видео
--k, -half,          --half                  Деление страницы пополам. Может быть либо "yes", либо "no". По умолчанию "$half".
--W, -video_width,   --video_width           Размер видео в пикселях по ширине. По умолчанию "$video_width".
--H, -video_height,  --video_height          Размер видео в пикселях по высоте. По умолчанию "$video_height".
--p, -ffmpeg_pre_options, --ffmpeg_pre_options
-                                            Опции ffmpeg в самом начале. По умолчанию "$ffmpeg_pre_options".
--P, -ffmpeg_options, --ffmpeg_options       Опции ffmpeg. По умолчанию "$ffmpeg_options".
--r, -page_range,    --page_range            Указывает страницы из выходного файла для обработки. Пример "{1..32}", "{2..10..2}", "\$(seq 5 3 30)"
-
+$(ProcessParams video_params Params2Help)
 EOF
 }
 
@@ -67,80 +140,49 @@ EOF
 # 'h' is a no-value option.
 # 'v:' implies that option -v has value and is a mandatory option. ':' means has a value.
 # 't::' implies that option -t has value but is optional. '::' means optional.
+small_params_list=$(ProcessParams all_params Params2small_list)
+small_params_list="${small_params_list:1}"
 
+large_params_list=$(ProcessParams all_params Params2large_list)
+large_params_list="${large_params_list:1}"
 
-options=$(getopt --long "help,version,verbose,input:,output:,emotion:,speaker:,speed:,ffmpeg_opt:,format:,quality:,lang:,half:,video_width:,video_height:, ffmpeg_pre_options:,ffmpeg_options:,page_range:" -o "hvVi:o:e:s:S:O:f:q:l:k:W:H:p:P:r:" -a -- "$@")
+options=$(getopt --long "$large_params_list" -o "$small_params_list" -a -- "$@")
 
 # set --:
 # If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters 
 # are set to the arguments, even if some of them begin with a ‘-’.
 eval set -- "$options"
 
+function Params2Case {
+    local small_cmd="$1"
+    local large_cmd="$2"
+    local comment="$3"
+    local use_param="$4"
+    local default="$5"
+    local custom_cmd="$6"
+    local custom_arg1="$7"
+    local custom_arg2="$8"
+
+    if [ "$custom_arg1" = "-${small_cmd}" ] || [ "$custom_arg1" = "-${large_cmd}" ] || [ "$custom_arg1" = "--${large_cmd}" ]; then
+        clear_custom_cmd="${custom_cmd//[$'\t\r\n ']/}" 
+        if [ "${clear_custom_cmd}" != "" ]; then
+            eval "${custom_cmd}"
+        else
+            eval "${large_cmd}=\"$custom_arg2\""
+        fi
+    fi
+}
+
 while true
 do
-case "$1" in
--h|--help) 
-    ShowHelp
-    exit
-    ;;
--v|--version) 
-    echo $version
-    exit
-    ;;
--V|--verbose)
-    verbose=true
-    ;;
--i|--input)
-    input_file="$2"
-    ;;
--o|--output)
-    out_file="$2"
-    ;;
--e|--emotion)
-    emotion="$2"
-    ;;
--s|--speaker)
-    speaker="$2"
-    ;;
--S|--speed)
-    speed="$2"
-    ;;
--O|--ffmpeg_opt)
-    ffmpeg_opt="$2"
-    ;;
--f|--format)
-    format="$2"
-    ;;
--q|--quality)
-    quality="$2"
-    ;;
--l|--lang)
-    lang="$2"
-    ;;
--H|--half)
-    half="$2"
-    ;;
--W|--video_width)
-    video_width="$2"
-    ;;
--H|--video_height)
-    video_height="$2"
-    ;;
--p|--ffmpeg_pre_options)
-    ffmpeg_pre_options="$2"
-    ;;
--P|--ffmpeg_options)
-    ffmpeg_options="$2"
-    ;;
--r|--page_range)
-    page_range="$2"
-    ;;
---)
-    shift
-    break;;
-esac
+cur_arg="$1"
+[ "$cur_arg" = '--' ] && { shift; break; }
+ProcessParams all_params Params2Case "$cur_arg" "$2"
 shift
 done
+
+input_file="$input"
+out_file="$output"
 
 unuse_param="$*"
 if [ "${input_file}" = "" ] || [ "${unuse_param}" != "" ]; then
@@ -157,16 +199,26 @@ page_count=$(pdfinfo "${input_file}" | awk '/^Pages:/ {print $2}')
 
 video_file_names_array=()
 
+function GetExec {
+    local exec_file_name=$1
+
+    exec="$exec_file_name"
+    [ ! -f "$exec" ] && exec="./$exec"
+    [ ! -f "$exec" ] && exec="~/$exec"
+
+    echo "$exec"
+}
+
 function Text2mp3 {
     local text_file=$1
     local mp3_file=$2
     verb=""
     [ $verbose ] && verb="-V"
 
-    ~/txt2mp3 -i "$text_file" -o "$mp3_file" -e $emotion -s $speaker -S $speed -f $format -q $quality -l $lang $verb
+    $(GetExec "txt2mp3") -i "$text_file" -o "$mp3_file" -e $emotion -s $speaker -S $speed -f $format -q $quality -l $lang $verb
 }
 
-function make_video {
+function MakeVideo {
     local page_image_file=$1
     local page_mp3_file=$2
     local page_mp4_file=$3
@@ -178,9 +230,9 @@ function make_video {
     local time_play=$(mp3info -p "%S\n" "${page_mp3_file}")
     local time_opt="-c:a copy"
     if [ ${minimum_time_on_page} -ge ${time_play} ]; then
-        local add_time=$(( 5 - ${time_play} ))
+        local add_time=5 # $(( 5 - ${time_play} ))
         time_opt="-c:a mp3 -af adelay=${add_time}s:all=true" # 
-        echo "time_opt ${time_opt}"
+        [ $verbose ] && echo "time_opt ${time_opt}"
     fi
 
     ffmpeg ${ffmpeg_pre_options} -i "${resized_page_image_file}" -i "${page_mp3_file}" ${ffmpeg_options} ${time_opt} "${page_mp4_file}"
@@ -223,9 +275,9 @@ for ((page=1;page<=${page_count};page++)); do
 
     page_image_file="${page_image_file}.png"
 
-    source_text=$(cat "${page_text_file}")
+    source_text="$(cat "${page_text_file}")"
 
-    if [ "$half"="yes" ] && [ ${#source_text} -ge $minimum_text_on_page ]; then
+    if [ "$split" = "yes" ] && [ ${#source_text} -ge $minimum_text_on_page ]; then
 
         space_char=" "
         split_size=$(( ${#source_text} / 2 + 2)) # Половина с небольшим запасом
@@ -266,9 +318,9 @@ for ((page=1;page<=${page_count};page++)); do
         page_mp4_file_half1="${input_file}_${page}_half1.mp4"
         page_mp4_file_half2="${input_file}_${page}_half2.mp4"
 
-        make_video "$page_image_file_half1" "$page_mp3_file_half1" "$page_mp4_file_half1"
+        MakeVideo "$page_image_file_half1" "$page_mp3_file_half1" "$page_mp4_file_half1"
 
-        make_video "$page_image_file_half2" "$page_mp3_file_half2" "$page_mp4_file_half2"
+        MakeVideo "$page_image_file_half2" "$page_mp3_file_half2" "$page_mp4_file_half2"
 
         rm "$page_image_file_half1"
         rm "$page_image_file_half2"
@@ -285,16 +337,15 @@ for ((page=1;page<=${page_count};page++)); do
 
         page_mp4_file="${input_file}_${page}.mp4"
 
-        make_video "$page_image_file" "$page_mp3_file" "$page_mp4_file"
-      
+        MakeVideo "$page_image_file" "$page_mp3_file" "$page_mp4_file"
+
         rm "$page_mp3_file"
 
     fi
-    
+
     rm "$page_image_file"
     rm "$page_text_file"
-  
-    
+
 done
 
 SAVE_IFS=$IFS

@@ -114,7 +114,7 @@ fi
 source_text=$(cat "${input_file}")
 
 # Удаляем все пробелы в начале и в конце строк и заменяем два и более пробелов на один, удаляем все непечатаемые символы
-source_text="$(echo "${source_text//[$'\t\r\n']}" | sed 's/^ *//;s/[ ^]*$//;s/  */ /;s/[^[:blank:][:print:]]//g')"
+source_text="$(echo "${source_text//[$'\t\r\n']/' '}" | sed 's/^ *//;s/[ ^]*$//;s/  */ /;s/[^[:blank:][:print:]]//g')"
 
 #[ $verbose ] && echo "Исходный текст $source_text" >> "out.txt"
 
