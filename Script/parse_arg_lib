@@ -1,0 +1,104 @@
+#!/bin/bash
+# Общественное достояние, 2024, Алексей Безбородов (Alexei Bezborodov) <AlexeiBv+mirocod_pdf2video@narod.ru> 
+
+# Обработка входных параметров
+
+# Формат:
+# "Однобуквенная комманда|Расширенная комманда|Справка|Параметр|Значение по умолчанию|Команда на исполнение"
+# Параметр: Пусто - нет параметров, : - есть параметр, :: - параметр не обязателен
+
+# Пример
+#common_params=(
+#    "i|input|Входной текстовый файл.|:|'1.txt'|"
+#    )
+
+function ProcessParams {
+    local iparams=$1[@]
+    local work_func=$2
+    local params=("${!iparams}")
+    local custom_arg1="$3"
+    local custom_arg2="$4"
+
+    SAVE_IFS=$IFS
+    IFS=""
+
+    for (( i=0; i< ${#params[*]}; i++))
+    do
+        p="${params[i]}"
+        readarray -d "|" -t cur_params <<< "$p"
+        small_cmd="${cur_params[0]}"
+        large_cmd="${cur_params[1]}"
+        comment="${cur_params[2]}"
+        use_param="${cur_params[3]}"
+        default="${cur_params[4]}"
+        custom_cmd="${cur_params[5]}"
+
+        $work_func "$small_cmd" "$large_cmd" "$comment" "$use_param" "$default" "$custom_cmd"  "$custom_arg1" "$custom_arg2"
+    done
+
+    IFS=$SAVE_IFS
+}
+
+function Params2InitVar {
+    local small_cmd="$1"
+    local large_cmd="$2"
+    local comment="$3"
+    local use_param="$4"
+    local default="$5"
+    local custom_cmd="$6"
+    if [ "$use_param" != '' ]; then
+        eval "${large_cmd}=${default}"
+    fi
+}
+
+function Params2Help {
+    local small_cmd="$1"
+    local large_cmd="$2"
+    local comment="$3"
+    local use_param="$4"
+    local default="$5"
+    local custom_cmd="$6"
+    echo "-${small_cmd}, -${large_cmd}, --${large_cmd}"
+    echo "        ${comment/"!DEFAULT!"/"${!large_cmd}"}"
+}
+
+function Params2small_list {
+    local small_cmd="$1"
+    local large_cmd="$2"
+    local comment="$3"
+    local use_param="$4"
+    local default="$5"
+    local custom_cmd="$6"
+    echo -n "${small_cmd}${use_param}"
+}
+
+function Params2large_list {
+    local small_cmd="$1"
+    local large_cmd="$2"
+    local comment="$3"
+    local use_param="$4"
+    local default="$5"
+    local custom_cmd="$6"
+    echo -n ",${large_cmd}${use_param}"
+}
+
+function Params2Case {
+    local small_cmd="$1"
+    local large_cmd="$2"
+    local comment="$3"
+    local use_param="$4"
+    local default="$5"
+    local custom_cmd="$6"
+    local custom_arg1="$7"
+    local custom_arg2="$8"
+
+    if [ "$custom_arg1" = "-${small_cmd}" ] || [ "$custom_arg1" = "-${large_cmd}" ] || [ "$custom_arg1" = "--${large_cmd}" ]; then
+        clear_custom_cmd="${custom_cmd//[$'\t\r\n ']/}" 
+        if [ "${clear_custom_cmd}" != "" ]; then
+            eval "${custom_cmd}"
+        else
+            eval "${large_cmd}=\"$custom_arg2\""
+        fi
+    fi
+}
+

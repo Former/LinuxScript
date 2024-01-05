@@ -3,36 +3,60 @@
 
 # Озвучивание текста из файла 
 
-# Параметры по умолчанию
-emotion='neutral'
-speaker='erkanyavas'
-speed='1.0'
-verbose=
-ffmpeg_opt=""
 version=1.0
-input_file=""
-out_file=""
-format="mp3"
-quality="hi"
-lang="ru_RU"
 
-ShowHelp() {
+# Формат:
+# "Однобуквенная комманда|Расширенная комманда|Справка|Параметр|Значение по умолчанию|Команда на исполнение"
+# Параметр: Пусто - нет параметров, : - есть параметр, :: - параметр не обязателен
+
+common_params=(
+    "h|help|Посмотреть помощь.|||ShowHelp; exit;"
+    "v|version|Посмотреть версию программы.|||echo \$version; exit;"
+    "V|verbose|Подробный вывод.|||verbose=true"
+#    "|||||"
+    )
+
+sound_params=(
+    "i|input|Входной текстовый файл.|:||"
+    "o|output|Выходной видео файл.|:|''|"
+    "e|emotion|Эмоциональный настрой говорящего. Может принимать значения 'neutral', 'good', 'evil'. По умолчанию '!DEFAULT!'.|:|'neutral'|"
+    "s|speaker|Голос говорящего. Может принимать значения 'oksana','jane','omazh','zahar','ermil','silaerkan','erkanyavas','alyss', 'nick'. По умолчанию '!DEFAULT!'.|:|'erkanyavas'|"
+    "S|speed|Скорость озвучки. По умолчанию '!DEFAULT!'.|:|'1.0'|"
+    "O|ffmpeg_opt|Дополнительные параметры ffmpeg.|:|''|"
+    "f|format|Выходной формат. Может быть либо 'mp3', либо 'wav'. По умолчанию '!DEFAULT!'.|:|'mp3'|"
+    "q|quality|Качество выходного файла. Может быть либо 'hi', либо 'lo'. По умолчанию '!DEFAULT!'.|:|'hi'|"
+    "l|lang|Язык озвучки. По умолчанию '!DEFAULT!'.|:|'ru_RU'|"
+#    "|||:||"
+    )
+
+all_params=("${common_params[@]}" "${sound_params[@]}")
+
+# Загружаем библиотеку
+function GetExec {
+    local exec_file_name="$1"
+
+    exec="$exec_file_name"
+    [ ! -f "$exec" ] && exec="./$exec_file_name"
+    [ ! -f "$exec" ] && exec="~/$exec_file_name"
+
+    echo "$exec"
+}
+
+eval "source $(GetExec "parse_arg_lib")"
+
+# Инициализация переменных
+ProcessParams all_params Params2InitVar
+
+function ShowHelp() {
 cat << EOF  
-Использование: txt2mp3 -i <text_file> [-o <mp3_file>] [-hV]
-Озвучивание текста
+Использование: pdf2mp3 -i <text_file> [-o <mp4_file>] [-hV]
+Озвучивание текста из файла
 
--h, -help,          --help                  Посмотреть помощь.
--v, -version,       --version               Посмотреть версию программы.
--i, -input,         --input                 Входной текстовый файл.
--o, -output,        --output                Выходной файл звуковой.
--e, -emotion,       --emotion               Эмоциональный настрой говорящего. Может принимать значения "neutral", "good", "evil". По умолчанию "$emotion".
--s, -speaker,       --speaker               Голос говорящего. Может принимать значения "oksana","jane","omazh","zahar","ermil","silaerkan","erkanyavas","alyss", "nick". По умолчанию "$speaker".
--S, -speed,         --speed                 Скорость озвучки. По умолчанию "$speed".
--O, -ffmpeg_opt,    --ffmpeg_opt            Дополнительные параметры ffmpeg.
--f, -format,        --format                Выходной формат. Может быть либо "mp3", либо "wav". По умолчанию "$format".
--q, -quality,       --quality               Качество выходного файла. Может быть либо "hi", либо "lo". По умолчанию "$quality".
--l, -lang,          --lang                  Язык озвучки. По умолчанию "$lang".
--V, -verbose,       --verbose               Подробный вывод.
+Общие параметры
+$(ProcessParams common_params Params2Help)
+
+Параметры звука
+$(ProcessParams sound_params Params2Help)
 EOF
 }
 
@@ -45,9 +69,13 @@ EOF
 # 'h' is a no-value option.
 # 'v:' implies that option -v has value and is a mandatory option. ':' means has a value.
 # 't::' implies that option -t has value but is optional. '::' means optional.
+small_params_list=$(ProcessParams all_params Params2small_list)
+small_params_list="${small_params_list:1}"
 
+large_params_list=$(ProcessParams all_params Params2large_list)
+large_params_list="${large_params_list:1}"
 
-options=$(getopt --long "help,version,verbose,input:,output:,emotion:,speaker:,speed:,ffmpeg_opt:,format:,quality:,lang:" -o "hvVi:o:e:s:S:O:f:q:l:" -a -- "$@")
+options=$(getopt --long "$large_params_list" -o "$small_params_list" -a -- "$@")
 
 # set --:
 # If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters 
@@ -56,51 +84,14 @@ eval set -- "$options"
 
 while true
 do
-case "$1" in
--h|--help) 
-    ShowHelp
-    exit
-    ;;
--v|--version) 
-    echo $version
-    exit
-    ;;
--V|--verbose)
-    verbose=true
-    ;;
--i|--input)
-    input_file="$2"
-    ;;
--o|--output)
-    out_file="$2"
-    ;;
--e|--emotion)
-    emotion="$2"
-    ;;
--s|--speaker)
-    speaker="$2"
-    ;;
--S|--speed)
-    speed="$2"
-    ;;
--O|--ffmpeg_opt)
-    ffmpeg_opt="$2"
-    ;;
--f|--format)
-    format="$2"
-    ;;
--q|--quality)
-    quality="$2"
-    ;;
--l|--lang)
-    lang="$2"
-    ;;
---)
-    shift
-    break;;
-esac
+cur_arg="$1"
+[ "$cur_arg" = '--' ] && { shift; break; }
+ProcessParams all_params Params2Case "$cur_arg" "$2"
 shift
 done
+
+input_file="$input"
+out_file="$output"
 
 unuse_param="$*"
 if [ "${input_file}" = "" ] || [ "$unuse_param" != "" ]; then
