@@ -55,9 +55,6 @@ function GetExec {
 
 eval "source $(GetExec "parse_arg_lib")"
 
-# Инициализация переменных
-ProcessParams all_params Params2InitVar
-
 function ShowHelp() {
 cat << EOF  
 Использование: pdf2video -i <text_file> [-o <mp4_file>] [-hV]
@@ -74,27 +71,7 @@ $(ProcessParams video_params Params2Help)
 EOF
 }
 
-# $@ is all command line parameters passed to the script.
-# -o is for short options like -v
-# -l is for long options with double dash like --version
-# the comma separates different long options
-# -a is for long options with single dash like -version
-# Example
-# 'h' is a no-value option.
-# 'v:' implies that option -v has value and is a mandatory option. ':' means has a value.
-# 't::' implies that option -t has value but is optional. '::' means optional.
-small_params_list=$(ProcessParams all_params Params2small_list)
-small_params_list="${small_params_list:1}"
-
-large_params_list=$(ProcessParams all_params Params2large_list)
-large_params_list="${large_params_list:1}"
-
-options=$(getopt --long "$large_params_list" -o "$small_params_list" -a -- "$@")
-
-# set --:
-# If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters 
-# are set to the arguments, even if some of them begin with a ‘-’.
-eval set -- "$options"
+# -------------------------------------------
 
 while true
 do

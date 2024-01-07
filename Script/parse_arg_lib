@@ -39,58 +39,37 @@ function ProcessParams {
     IFS=$SAVE_IFS
 }
 
+param_var='local small_cmd="$1";local large_cmd="$2";local comment="$3";local use_param="$4";local default="$5";local custom_cmd="$6";local custom_arg1="$7";local custom_arg2="$8";'
+
 function Params2InitVar {
-    local small_cmd="$1"
-    local large_cmd="$2"
-    local comment="$3"
-    local use_param="$4"
-    local default="$5"
-    local custom_cmd="$6"
+    eval "$param_var"
+
     if [ "$use_param" != '' ]; then
         eval "${large_cmd}=${default}"
     fi
 }
 
 function Params2Help {
-    local small_cmd="$1"
-    local large_cmd="$2"
-    local comment="$3"
-    local use_param="$4"
-    local default="$5"
-    local custom_cmd="$6"
+    eval "$param_var"
+
     echo "-${small_cmd}, -${large_cmd}, --${large_cmd}"
     echo "        ${comment/"!DEFAULT!"/"${!large_cmd}"}"
 }
 
 function Params2small_list {
-    local small_cmd="$1"
-    local large_cmd="$2"
-    local comment="$3"
-    local use_param="$4"
-    local default="$5"
-    local custom_cmd="$6"
+    eval "$param_var"
+
     echo -n "${small_cmd}${use_param}"
 }
 
 function Params2large_list {
-    local small_cmd="$1"
-    local large_cmd="$2"
-    local comment="$3"
-    local use_param="$4"
-    local default="$5"
-    local custom_cmd="$6"
+    eval "$param_var"
+
     echo -n ",${large_cmd}${use_param}"
 }
 
 function Params2Case {
-    local small_cmd="$1"
-    local large_cmd="$2"
-    local comment="$3"
-    local use_param="$4"
-    local default="$5"
-    local custom_cmd="$6"
-    local custom_arg1="$7"
-    local custom_arg2="$8"
+    eval "$param_var"
 
     if [ "$custom_arg1" = "-${small_cmd}" ] || [ "$custom_arg1" = "-${large_cmd}" ] || [ "$custom_arg1" = "--${large_cmd}" ]; then
         clear_custom_cmd="${custom_cmd//[$'\t\r\n ']/}" 
@@ -101,4 +80,29 @@ function Params2Case {
         fi
     fi
 }
+
+# Инициализация переменных
+ProcessParams all_params Params2InitVar
+
+# $@ is all command line parameters passed to the script.
+# -o is for short options like -v
+# -l is for long options with double dash like --version
+# the comma separates different long options
+# -a is for long options with single dash like -version
+# Example
+# 'h' is a no-value option.
+# 'v:' implies that option -v has value and is a mandatory option. ':' means has a value.
+# 't::' implies that option -t has value but is optional. '::' means optional.
+small_params_list=$(ProcessParams all_params Params2small_list)
+small_params_list="${small_params_list:1}"
+
+large_params_list=$(ProcessParams all_params Params2large_list)
+large_params_list="${large_params_list:1}"
+
+options=$(getopt --long "$large_params_list" -o "$small_params_list" -a -- "$@")
+
+# set --:
+# If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters 
+# are set to the arguments, even if some of them begin with a ‘-’.
+eval set -- "$options"
 
