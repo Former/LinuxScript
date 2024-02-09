@@ -1,10 +1,10 @@
 #!/bin/bash
-# Общественное достояние, 2024, Алексей Безбородов (Alexei Bezborodov) <AlexeiBv+mirocod_pdf2video@narod.ru> 
+# Общественное достояние, 2024, Алексей Безбородов (Alexei Bezborodov) <AlexeiBv+mirocod_parse_arg_lib@narod.ru> 
 
 # Обработка входных параметров
 
 # Формат:
-# "Однобуквенная комманда|Расширенная комманда|Справка|Параметр|Значение по умолчанию|Команда на исполнение"
+# "Однобуквенная команда|Расширенная команда|Справка|Параметр|Значение по умолчанию|Команда на исполнение"
 # Параметр: Пусто - нет параметров, : - есть параметр, :: - параметр не обязателен
 
 # Пример
@@ -105,4 +105,6 @@ options=$(getopt --long "$large_params_list" -o "$small_params_list" -a -- "$@")
 # If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters 
 # are set to the arguments, even if some of them begin with a ‘-’.
 eval set -- "$options"
+
+main_loop='while true; do cur_arg="$1"; [ "$cur_arg" = "--" ] && { shift; break; }; ProcessParams all_params Params2Case "$cur_arg" "$2"; shift; done'
 
