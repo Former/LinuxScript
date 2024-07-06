@@ -45,6 +45,7 @@ sudo apt-get install \
  nemo-compare nemo-share-common nemo-arronax nemo-preview nemo-python-devel \
  nemo-extensions-translations nemo-translations nemo-terminal nemo-share \
  nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk\
+ testdisk photorec\
  nano
 
 # Gedit plugins
@@ -72,6 +73,8 @@ flatpak install flathub app.organicmaps.desktop
 flatpak remote-info --log flathub app.organicmaps.desktop
 sudo flatpak update --commit=beb1e1a66d50646cfe162437bca7b19fdd9178e3f505fcdc351a74415dbca628 app.organicmaps.desktop
 flatpak run app.organicmaps.desktop
+
+flatpak install flathub io.github.prateekmedia.appimagepool
 
 # Gps
 sudo apt-get install xgps gpsd gpsmon
@@ -114,3 +117,7 @@ dconf write /org/gnome/software/download-updates false
 
 # fuse config
 sudo control fusermount public
+
+# tuxguitar
+wget -c https://github.com/helge17/tuxguitar/releases/download/1.6.0/tuxguitar-1.6.0_linux-swt.x86_64.rpm
+sudo apt-get install ./tuxguitar-1.6.0_linux-swt.x86_64.rpm
