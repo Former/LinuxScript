@@ -22,6 +22,7 @@ sudo tar cvpzf "${backup_dir}/$(hostname)_home_backup_$(date +%yy%mm%dd-%Hh%Mm%S
 --exclude=.mozilla/firefox/*.*/storage \
 --exclude=*/.cache/* \
 --exclude=*/Загрузки/* \
+--exclude=*/Backup/* \
 --exclude=*/Музыка/* \
 --exclude=.cache \
 --exclude=/.config/chromium/*/CacheStorage \
@@ -40,6 +41,7 @@ sudo tar cvpzf "${backup_dir}/$(hostname)_home_backup_$(date +%yy%mm%dd-%Hh%Mm%S
 --exclude=go/pkg \
 --exclude=.apt \
 --exclude=.npm \
+--exclude=.gradle \
 .
 
 # Удаляем старые архивы

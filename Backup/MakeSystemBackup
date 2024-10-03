@@ -25,6 +25,7 @@ sudo tar cvpzf "${backup_dir}/$(hostname)_sysbackup_$(date +%yy%mm%dd-%Hh%Mm%Ss)
 --exclude=/lost+found \
 --exclude=/*sysbackup*.tgz \
 --exclude=/mnt \
+--exclude=/run/media \
 --exclude=/sys \
 --exclude=/home \
 --exclude=/media \
