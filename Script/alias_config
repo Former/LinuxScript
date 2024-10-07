@@ -1,0 +1,96 @@
+#!/bin/bash
+
+prefix='al_'
+
+mkalias_with_prefix()
+{
+	alias ${prefix}$1="$1"
+}
+
+pdf_a5()
+{
+	pdfjam "$1" --scale 0.71 --offset '0 50mm' -o "a5_$1"
+}
+mkalias_with_prefix 'pdf_a5'
+
+pdf_a6()
+{
+	pdfjam "$1" --scale 0.5 --offset '0 75mm' -o "a6_$1"
+}
+mkalias_with_prefix 'pdf_a6'
+
+pdf_pagenum()
+{
+	pdfjam  --preamble '\usepackage{fancyhdr} \pagestyle{fancy} \topmargin -65pt \oddsidemargin 150pt \rfoot{} \cfoot{} \rhead{} \chead{\Large\thepage} \renewcommand {\headrulewidth}{0pt} \renewcommand {\footrulewidth}{0pt} '  --pagecommand '\thispagestyle{fancy}' -o "pagenum_$1" "$1"
+}
+mkalias_with_prefix 'pdf_pagenum'
+
+pdf_contrast_correct()
+{
+	pdfjam  --preamble '\usepackage{fancyhdr} \pagestyle{fancy} \topmargin -65pt \oddsidemargin 150pt \rfoot{} \cfoot{} \rhead{} \chead{\Large\thepage} \renewcommand {\headrulewidth}{0pt} \renewcommand {\footrulewidth}{0pt} '  --pagecommand '\thispagestyle{fancy}' -o "pagenum_$1" "$1"
+}
+mkalias_with_prefix 'pdf_contrast_correct'
+
+pdf_gamma_correct()
+{
+	gamma=$2
+	[ gamma == '' ] && gamma=3
+
+	mkdir tmp
+	convert -density 300 $1 tmp/output-%03d.jpg
+	convert tmp/output*.jpg -gamma ${gamma} tmp/final-%03d.jpg
+	# convert tmp/output*.jpg -level 0% tmp/final-%03d.jpg
+	convert tmp/final*.jpg new_$1
+}
+mkalias_with_prefix 'pdf_gamma_correct'
+
+pdf_all_to_one_file()
+{
+	convert -density 300 '*.pdf' -density 300 all.pdf
+}
+mkalias_with_prefix 'pdf_all_to_one_file'
+
+alias ${prefix}archive_each_file_into_separate_archive="find . -mindepth 1 -maxdepth 1 -type f -exec tar -cvzf 'out/{}.tgz' '{}' \;"
+
+unicode_U200B_correct ()
+{
+	perl -CSD -pe "s/\N{U+200B}//gu" < $1 > noU200B_$1
+}
+mkalias_with_prefix 'unicode_U200B_correct'
+
+festival_txt2mp3 ()
+{
+	in_file=$1
+	out_wav_file_name="$1.wav"
+	out_mp3_file_name="$1.mp3"
+	cat "$1" | sed 's/[^a-zA-ZА-Яа-я0-9., ]//g' | text2wave -o "$out_wav_file_name"
+	lame "$out_wav_file_name" "$out_mp3_file_name"
+	rm "$out_wav_file_name"
+}
+mkalias_with_prefix 'festival_txt2mp3'
+
+encode_240()
+{
+	for filename in "$1"; do 
+		echo "Take '${filename}'"; 
+		if [ -f "${filename}" ]; then
+			echo "Make '${filename}'"; 
+			ffmpeg -i "${filename}" -vcodec libx264 -vb 50K -s 240x180 -acodec libmp3lame -ab 16K -strict -2 "${filename}_240.mkv"
+		fi
+	done
+}
+mkalias_with_prefix 'encode_240'
+
+union_video_and_audio()
+{
+	ffmpeg -i $1  -i $2 -c:a aac -b:a 128k -vcodec copy -map 0:v -map 1:a o.mp4
+}
+mkalias_with_prefix 'union_video_and_audio'
+
+yt_download()
+{
+	~/.local/bin/yt-dlp -f "worst/worstvideo+worstaudio" -R 10000 -i -o "%(upload_date)s-%(title)s-%(id)s.%(ext)s" $1
+}
+mkalias_with_prefix 'yt_download'
+
+alias ${prefix}gen_password='openssl rand -base64 10'
