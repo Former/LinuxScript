@@ -1,0 +1,3 @@
+#!/bin/bash
+perl -CSD -pe "s/\N{U+200B}//gu" < $1 > noU200B_$1
+
