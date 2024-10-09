@@ -43,13 +43,14 @@ sudo apt-get install \
  retext pdfmod\
  gedit gedit-plugins gedit-plugin-devhelp gedit-plugins-latex \
  cinnamon-full idesk icewm pcmanfm volumeicon mc \
- nemo nemo-emblems nemo-fileroller \
- nemo-compare nemo-share-common nemo-arronax nemo-preview nemo-python-devel \
- nemo-extensions-translations nemo-translations nemo-terminal nemo-share \
- nemo-image-converter nemo-python nemo-preview-gir-devel nemo-sendto-clamtk\
+ nemo nemo-image-converter nemo-sendto-clamtk
+ nemo-arronax nemo-preview nemo-share \
+ nemo-beesu-manager nemo-preview-gir-devel nemo-share-common \
+ nemo-extensions-translations nemo-python nemo-terminal \
+ nemo-fileroller nemo-python-devel nemo-translations \
  photorec\
  mp3info\
- rosegarden frescobaldi lilypond\
+ frescobaldi lilypond\
  nano\
  flatpak
 
@@ -60,8 +61,8 @@ sudo eepm play skype
 sudo eepm play telegram
 sudo eepm play zoom
 
-wget https://packages.ntop.org/centos-stable/8/x86_64/Packages/n2n-3.0.0-1044.x86_64.rpm
-sudo apt-get install ./n2n-3.0.0-1044.x86_64.rpm
+wget https://github.com/ntop/n2n/releases/download/3.0/n2n-3.0.0-1038.x86_64.rpm
+sudo apt-get install ./n2n-3.0.0-1038.x86_64.rpm
 
 # rpi
 wget https://packages.ntop.org/RaspberryPI/bullseye_pi/arm64/n2n/n2n_3.1.1-76-g709590d_arm64.deb

@@ -112,3 +112,19 @@ all_to_djvu()
 	djvm -c new.djvu *.djvu
 }
 mkalias_with_prefix 'all_to_djvu'
+
+resize_and_del_exif()
+{
+    search_template=$1
+    [ "${search_template}" = "" ] && search_template="./*.JPG"
+
+    image_width=$2
+    [ "${image_width}" = "" ] && image_width="1024"
+
+    for entry in "$search_template"
+    do
+        echo "${entry}"
+        convert "${entry}" -resize ${image_width} -strip "new.jpg"
+    done
+}
+mkalias_with_prefix 'resize_and_del_exif'
