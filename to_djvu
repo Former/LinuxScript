@@ -1,3 +1,0 @@
-for i in *JPG; do bmptopnm $i > pnm/$i.pnm; done
-for i in *; do c44 -dpi 300 -slice 60+7+7 $i $i.djvu; done
-djvm -c new.djvu *.djvu

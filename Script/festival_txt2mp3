@@ -1,8 +1,0 @@
-#!/bin/sh
-in_file=$1
-out_wav_file_name="$1.wav"
-out_mp3_file_name="$1.mp3"
-cat "$1" | sed 's/[^a-zA-ZА-Яа-я0-9., ]//g' | text2wave -o "$out_wav_file_name"
-lame "$out_wav_file_name" "$out_mp3_file_name"
-rm "$out_wav_file_name"
-

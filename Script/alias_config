@@ -46,7 +46,10 @@ mkalias_with_prefix 'pdf_gamma_correct'
 
 pdf_all_to_one_file()
 {
-	convert -density 300 '*.pdf' -density 300 all.pdf
+	in_files_pattern=$1
+	[ in_files_pattern == '' ] && in_files_pattern='*.pdf'
+
+	convert -density 300 "${in_files_pattern}" -density 300 all.pdf
 }
 mkalias_with_prefix 'pdf_all_to_one_file'
 
@@ -94,3 +97,18 @@ yt_download()
 mkalias_with_prefix 'yt_download'
 
 alias ${prefix}gen_password='openssl rand -base64 10'
+
+cur_dir=${alias_dir}
+alias parse_arg_lib='${cur_dir}/../video_tools/parse_arg_lib'
+alias ${prefix}img_and_wav2video='${cur_dir}/../video_tools/img_and_wav2video'
+alias ${prefix}union_video_and_audio='${cur_dir}/../video_tools/union_video_and_audio.bash'
+
+all_to_djvu()
+{
+	in_files_pattern=$1
+	[ in_files_pattern == '' ] && in_files_pattern='*JPG'
+	for i in ${in_files_pattern}; do bmptopnm $i > pnm/$i.pnm; done
+	for i in *; do c44 -dpi 300 -slice 60+7+7 $i $i.djvu; done
+	djvm -c new.djvu *.djvu
+}
+mkalias_with_prefix 'all_to_djvu'
