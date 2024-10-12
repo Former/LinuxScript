@@ -52,6 +52,8 @@ sudo apt-get install \
  mp3info\
  frescobaldi lilypond\
  nano\
+ libgtop-gir libgtop-gir-devel \
+ inkscape inkscape-viewer \
  flatpak
 
 # Gedit plugins
