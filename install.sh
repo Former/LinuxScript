@@ -54,6 +54,9 @@ sudo apt-get install \
  nano\
  libgtop-gir libgtop-gir-devel \
  inkscape inkscape-viewer \
+ meld kdiff3 \
+ python3-module-pip \
+ NetworkManager-tui \
  flatpak
 
 # Gedit plugins
@@ -132,3 +135,6 @@ sudo control fusermount public
 # tuxguitar
 wget -c https://github.com/helge17/tuxguitar/releases/download/1.6.0/tuxguitar-1.6.0_linux-swt.x86_64.rpm
 sudo apt-get install ./tuxguitar-1.6.0_linux-swt.x86_64.rpm
+
+# Enable wi-fi to Android 13
+nmcli connection modify WIFINAME wifi-sec.pmf 1
