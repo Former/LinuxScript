@@ -52,6 +52,7 @@ sudo apt-get install \
  mp3info\
  frescobaldi lilypond\
  nano\
+ token-manager \
  flatpak
 
 # Gedit plugins
