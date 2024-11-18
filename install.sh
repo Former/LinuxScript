@@ -53,6 +53,8 @@ sudo apt-get install \
  frescobaldi lilypond\
  nano\
  token-manager \
+ libgtop-gir libgtop-gir-devel \
+ inkscape inkscape-viewer \
  flatpak
 
 # Gedit plugins
