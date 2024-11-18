@@ -90,11 +90,43 @@ union_video_and_audio()
 }
 mkalias_with_prefix 'union_video_and_audio'
 
-yt_download()
+vd='~/.local/bin/yt-dlp'
+alias ${prefix}download_yt_dlp="${vd}"
+
+download_worst()
 {
-	~/.local/bin/yt-dlp -f "worst/worstvideo+worstaudio" -R 10000 -i -o "%(upload_date)s-%(title)s-%(id)s.%(ext)s" $1
+	cmd="${vd} -f 'worst/worstvideo+worstaudio' -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $1"
+	eval $cmd
 }
-mkalias_with_prefix 'yt_download'
+mkalias_with_prefix 'download_worst'
+
+download_best()
+{
+	cmd="${vd} -f 'best/bestvideo+bestaudio' -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $1"
+	eval $cmd
+}
+mkalias_with_prefix 'download_best'
+
+download_worst_audio()
+{
+	cmd="${vd} -f 'worstaudio' -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $1"
+	eval $cmd
+}
+mkalias_with_prefix 'download_worst_audio'
+
+download_format_list()
+{
+	cmd="${vd} -F $1"
+	eval $cmd
+}
+mkalias_with_prefix 'download_format_list'
+
+download_custom()
+{
+	cmd="${vd} -f $1 -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $2"
+	eval $cmd
+}
+mkalias_with_prefix 'download_custom'
 
 alias ${prefix}gen_password='openssl rand -base64 10'
 
