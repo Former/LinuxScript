@@ -138,3 +138,8 @@ sudo apt-get install ./tuxguitar-1.6.0_linux-swt.x86_64.rpm
 
 # Enable wi-fi to Android 13
 nmcli connection modify WIFINAME wifi-sec.pmf 1
+
+# Установить максимальный уровень заряда и поизводительности
+sudo ap-get install tlp
+echo "80" > /sys/class/power_supply/BAT0/charge_control_end_threshold
+echo "80" > /sys/devices/system/cpu/intel_pstate/max_perf_pct
