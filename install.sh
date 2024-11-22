@@ -52,6 +52,7 @@ sudo apt-get install \
  mp3info\
  frescobaldi lilypond\
  nano\
+ token-manager \
  libgtop-gir libgtop-gir-devel \
  inkscape inkscape-viewer \
  meld kdiff3 \
