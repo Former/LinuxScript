@@ -45,7 +45,7 @@ eval "source $(GetExec "parse_arg_lib")"
 
 function ShowHelp() {
 cat << EOF  
-Использование: pdf2video -i <text_file> [-o <mp4_file>] [-hV]
+Использование: img_and_wav2video -i <image> -a <wav> [-o <mp4_file>] [-hV]
 Озвучивание русского текста из файла pdf и сохранение в видео
 
 Общие параметры
