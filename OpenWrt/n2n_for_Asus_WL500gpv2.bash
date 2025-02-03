@@ -6,15 +6,23 @@
 #sudo apt-get install perl-IPC-Cmd perl-CPAN
 #cpan JSON
 
-# https://downloads.openwrt.org/snapshots/targets/bcm47xx/legacy/openwrt-sdk-bcm47xx-legacy_gcc-13.3.0_musl.Linux-x86_64.tar.zst
-# https://archive.openwrt.org/releases/19.07.0/targets/brcm47xx/legacy/
-# wget https://archive.openwrt.org/releases/21.02.1/targets/bcm47xx/legacy/
-sdk_name=openwrt-sdk-22.03.0-bcm47xx-legacy_gcc-11.2.0_musl.Linux-x86_64
-sdk=${sdk_name}.tar.xz
+# wl500gpv2 https://archive.openwrt.org/releases/22.03.0/targets/bcm47xx/legacy/openwrt-sdk-22.03.0-bcm47xx-legacy_gcc-11.2.0_musl.Linux-x86_64.tar.xz
 
-[ -f ./${sdk} ] || wget https://archive.openwrt.org/releases/22.03.0/targets/bcm47xx/legacy/${sdk}
+# wl520gu
+url="https://downloads.openwrt.org/releases/19.07.6/targets/brcm47xx/legacy/openwrt-sdk-19.07.6-brcm47xx-legacy_gcc-7.5.0_musl.Linux-x86_64.tar.xz"
+# Fix gcc version include/prereq-build.mk: grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)' to grep -E '^(4\.[8-9]|[5-9]\.?|[1-9][0-9]\.?)'
+#более менее но неудачно "https://downloads.openwrt.org/releases/19.07.4/targets/brcm47xx/legacy/openwrt-sdk-19.07.4-brcm47xx-legacy_gcc-7.5.0_musl.Linux-x86_64.tar.xz"
 
-[ -d ./${sdk_name} ] || tar -xf ${sdk}
+file_name="${url##*/}"
+base="${file_name%.[^.]*.[^.]*}"
+ext="${file_name:${#base} + 1}"
+
+sdk_name=${base}
+sdk=${file_name}
+
+[ -f ./${sdk} ] || wget "${url}"
+
+[ -d ./${sdk_name} ] || tar -xf "${sdk}"
 
 [ -f ./n2n ] || git clone https://github.com/ntop/n2n n2n
 
@@ -34,4 +42,6 @@ make package/n2n/prepare USE_SOURCE_DIR=$(realpath ../n2n) V=s
 make package/n2n/compile V=s
 
 find . -name "n2n*.ipk"
+
+
 
