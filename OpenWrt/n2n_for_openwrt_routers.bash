@@ -8,10 +8,10 @@
 
 # wl500gpv2 https://archive.openwrt.org/releases/22.03.0/targets/bcm47xx/legacy/openwrt-sdk-22.03.0-bcm47xx-legacy_gcc-11.2.0_musl.Linux-x86_64.tar.xz
 
-# wl520gu
-url="https://downloads.openwrt.org/releases/19.07.6/targets/brcm47xx/legacy/openwrt-sdk-19.07.6-brcm47xx-legacy_gcc-7.5.0_musl.Linux-x86_64.tar.xz"
-# Fix gcc version include/prereq-build.mk: grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)' to grep -E '^(4\.[8-9]|[5-9]\.?|[1-9][0-9]\.?)'
-#более менее но неудачно "https://downloads.openwrt.org/releases/19.07.4/targets/brcm47xx/legacy/openwrt-sdk-19.07.4-brcm47xx-legacy_gcc-7.5.0_musl.Linux-x86_64.tar.xz"
+# wl520gu url="https://downloads.openwrt.org/releases/19.07.6/targets/brcm47xx/legacy/openwrt-sdk-19.07.6-brcm47xx-legacy_gcc-7.5.0_musl.Linux-x86_64.tar.xz" # Fix gcc version include/prereq-build.mk: grep -E '^(4\.[8-9]|[5-9]\.?|13\.?)'
+
+# dir 620 c1 (asus_rt-n15u)
+url="https://downloads.openwrt.org/releases/23.05.5/targets/bcm47xx/mips74k/openwrt-sdk-23.05.5-bcm47xx-mips74k_gcc-12.3.0_musl.Linux-x86_64.tar.xz"
 
 file_name="${url##*/}"
 base="${file_name%.[^.]*.[^.]*}"
