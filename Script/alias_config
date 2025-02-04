@@ -160,3 +160,17 @@ resize_and_del_exif()
     done
 }
 mkalias_with_prefix 'resize_and_del_exif'
+
+ssh_del_known_host()
+{
+	in_host_pattern=$1
+	if [ "${in_host_pattern}" = "" ]; then 
+	    echo 'Укажите шаблон адреса, например "192.168.1.*"'
+	    return
+	fi
+    echo "cp ~/.ssh/known_hosts ~/.ssh/known_hosts.backup && cat ~/.ssh/known_hosts.backup | grep -v ${in_host_pattern} > ~/.ssh/known_hosts"
+
+}
+mkalias_with_prefix 'ssh_del_known_host'
+
+
