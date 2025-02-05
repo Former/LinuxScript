@@ -174,3 +174,11 @@ ssh_del_known_host()
 mkalias_with_prefix 'ssh_del_known_host'
 
 
+ssh_openwpt_10()
+{
+	in_host_pattern=$1
+    ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c 3des-cbc ${in_host_pattern}
+
+}
+mkalias_with_prefix 'ssh_openwpt_10'
+
