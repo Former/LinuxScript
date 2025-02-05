@@ -10,8 +10,10 @@
 
 # wl520gu url="https://downloads.openwrt.org/releases/19.07.6/targets/brcm47xx/legacy/openwrt-sdk-19.07.6-brcm47xx-legacy_gcc-7.5.0_musl.Linux-x86_64.tar.xz" # Fix gcc version include/prereq-build.mk: grep -E '^(4\.[8-9]|[5-9]\.?|13\.?)'
 
-# dir 620 c1 (asus_rt-n15u)
-url="https://downloads.openwrt.org/releases/23.05.5/targets/bcm47xx/mips74k/openwrt-sdk-23.05.5-bcm47xx-mips74k_gcc-12.3.0_musl.Linux-x86_64.tar.xz"
+# dir 620 c1 (asus_rt-n15u) url="https://downloads.openwrt.org/releases/23.05.5/targets/bcm47xx/mips74k/openwrt-sdk-23.05.5-bcm47xx-mips74k_gcc-12.3.0_musl.Linux-x86_64.tar.xz"
+
+# wl520gu 17.01.7
+url="https://archive.openwrt.org/releases/17.01.7/targets/brcm47xx/legacy/lede-sdk-17.01.7-brcm47xx-legacy_gcc-5.4.0_musl-1.1.16.Linux-x86_64.tar.xz"
 
 file_name="${url##*/}"
 base="${file_name%.[^.]*.[^.]*}"
