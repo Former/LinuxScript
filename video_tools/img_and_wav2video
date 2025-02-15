@@ -1,7 +1,7 @@
 #!/bin/bash
 # Общественное достояние, 2024, Алексей Безбородов (Alexei Bezborodov) <AlexeiBv+linux_script@narod.ru> 
 
-# Озвучивание русского текста из файла pdf и сохранение в видео
+# Объединение картинки и звука в видео
 
 version=1.0
 
@@ -59,6 +59,7 @@ $(ProcessParams video_params Params2Help)
 
 Примеры:
 
+img_and_wav2video -i image.jpg -a audio.wav -o out.mp4
 # Расширенный вывод
 img_and_wav2video -i image.jpg -a audio.wav -o out.mp4 -V
 

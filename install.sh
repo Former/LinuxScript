@@ -23,8 +23,8 @@ sudo apt-get dist-upgrade
 sudo update-kernel
 
 sudo apt-get install \
- pwgen xclip audacious audacity\
- gparted testdisk gnome-disk-utility baobab \
+ pwgen xclip audacious audacity \
+ gparted testdisk gnome-disk-utility baobab pv \
  cpu-x gnome-system-monitor \
  wol sshfs traceroute encfs openssh-server nmap\
  remmina xrdp qbittorrent \
@@ -40,7 +40,7 @@ sudo apt-get install \
  minetest\
  texlive texstudio \
  systemd-settings-disable-kill-user-processes \
- retext pdfmod\
+ retext pdfmod \
  gedit gedit-plugins gedit-plugin-devhelp gedit-plugins-latex \
  cinnamon-full idesk icewm pcmanfm volumeicon mc \
  nemo nemo-image-converter nemo-sendto-clamtk
@@ -50,7 +50,7 @@ sudo apt-get install \
  nemo-fileroller nemo-python-devel nemo-translations \
  photorec\
  mp3info\
- frescobaldi lilypond\
+ frescobaldi lilypond \
  nano\
  token-manager \
  libgtop-gir libgtop-gir-devel \
@@ -61,35 +61,41 @@ sudo apt-get install \
  flatpak
 
 # Gedit plugins
-https://github.com/hannenz/duplicate
+git clone https://github.com/hannenz/duplicate
 
-sudo eepm play skype
-sudo eepm play telegram
-sudo eepm play zoom
+epm play skype
+epm play telegram
+epm play zoom
 
+# n2n
 wget https://github.com/ntop/n2n/releases/download/3.0/n2n-3.0.0-1038.x86_64.rpm
 sudo apt-get install ./n2n-3.0.0-1038.x86_64.rpm
-
-# rpi
+# n2n rpi altlinux
 wget https://packages.ntop.org/RaspberryPI/bullseye_pi/arm64/n2n/n2n_3.1.1-76-g709590d_arm64.deb
 sudo epm -i ./n2n_3.1.1-76-g709590d_arm64.deb
 
 sudo systemctl enable --now edge.service 
-
-git config --global core.editor mcedit
 
 ## Flathub
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 ## organicmaps
 flatpak install flathub app.organicmaps.desktop
 flatpak remote-info --log flathub app.organicmaps.desktop
-sudo flatpak update --commit=beb1e1a66d50646cfe162437bca7b19fdd9178e3f505fcdc351a74415dbca628 app.organicmaps.desktop
+#sudo flatpak update --commit=beb1e1a66d50646cfe162437bca7b19fdd9178e3f505fcdc351a74415dbca628 app.organicmaps.desktop
 flatpak run app.organicmaps.desktop
 
 # appimagepool
 flatpak install flathub io.github.prateekmedia.appimagepool
 # AndroidStudio
 flatpak install flathub com.google.AndroidStudio
+
+# XnConvert
+Download: https://www.xnview.com/en/xnconvert/#downloads
+sudo epm install ./XnConvert-linux-x64.deb
+
+# tuxguitar
+wget -c https://github.com/helge17/tuxguitar/releases/download/1.6.0/tuxguitar-1.6.0_linux-swt.x86_64.rpm
+sudo apt-get install ./tuxguitar-1.6.0_linux-swt.x86_64.rpm
 
 # Gps
 sudo apt-get install xgps gpsd gpsmon
@@ -111,16 +117,17 @@ hwmon /sys/class/thermal/thermal_zone0/temp
 (5, 64, 71) 
 (7, 68, 32767)
 
-test: sudo /usr/sbin/thinkfan -n
+# test: 
+sudo /usr/sbin/thinkfan -n
+# run: 
 systemctl enable --now thinkfan.service
 
-# By root:
+# Set max freq
 EDITOR=mcedit crontab -e
 @reboot cpupower frequency-set --max 2.3G
 
-# XnConvert
-Download: https://www.xnview.com/en/xnconvert/#downloads
-sudo epm install ./XnConvert-linux-x64.deb
+# git
+git config --global core.editor mcedit
 
 # Disable autostart gnome-software
 mkdir -pv ~/.config/autostart && cp /etc/xdg/autostart/gnome-software-service.desktop ~/.config/autostart/
@@ -130,17 +137,13 @@ dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.d
 dconf write /org/gnome/software/allow-updates false
 dconf write /org/gnome/software/download-updates false
 
-# fuse config
+# Fuse config
 sudo control fusermount public
 
-# tuxguitar
-wget -c https://github.com/helge17/tuxguitar/releases/download/1.6.0/tuxguitar-1.6.0_linux-swt.x86_64.rpm
-sudo apt-get install ./tuxguitar-1.6.0_linux-swt.x86_64.rpm
-
-# Enable wi-fi to Android 13
+# Enable wi-fi for Android 13 in altlinux
 nmcli connection modify WIFINAME wifi-sec.pmf 1
 
 # Установить максимальный уровень заряда и поизводительности
-sudo ap-get install tlp
-echo "80" > /sys/class/power_supply/BAT0/charge_control_end_threshold
-echo "80" > /sys/devices/system/cpu/intel_pstate/max_perf_pct
+sudo apt-get install tlp
+sudo echo "80" > /sys/class/power_supply/BAT0/charge_control_end_threshold
+sudo echo "80" > /sys/devices/system/cpu/intel_pstate/max_perf_pct

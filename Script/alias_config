@@ -4,37 +4,46 @@ prefix='al_'
 
 mkalias_with_prefix()
 {
-	alias ${prefix}$1="$1"
+    alias ${prefix}$1="$1"
 }
 
 pdf_a5()
 {
-	pdfjam "$1" --scale 0.71 --offset '0 50mm' -o "a5_$1"
+    [ $1 == '' ] && printf "Преобразование pdf к формату А5\nОшибка! Укажите входной файл\n" && return
+    pdfjam "$1" --scale 0.71 --offset '0 50mm' -o "a5_$1"
 }
 mkalias_with_prefix 'pdf_a5'
 
 pdf_a6()
 {
-	pdfjam "$1" --scale 0.5 --offset '0 75mm' -o "a6_$1"
+    [ $1 == '' ] && printf "Преобразование pdf к формату А6\nОшибка! Укажите входной файл\n" && return
+    pdfjam "$1" --scale 0.5 --offset '0 75mm' -o "a6_$1"
 }
 mkalias_with_prefix 'pdf_a6'
 
 pdf_pagenum()
 {
-	pdfjam  --preamble '\usepackage{fancyhdr} \pagestyle{fancy} \topmargin -65pt \oddsidemargin 150pt \rfoot{} \cfoot{} \rhead{} \chead{\Large\thepage} \renewcommand {\headrulewidth}{0pt} \renewcommand {\footrulewidth}{0pt} '  --pagecommand '\thispagestyle{fancy}' -o "pagenum_$1" "$1"
+    [ $1 == '' ] && printf "Добавить номер страницы в pdf\nОшибка! Укажите входной файл\n" && return
+    pdfjam  --preamble '\usepackage{fancyhdr} \pagestyle{fancy} \topmargin -65pt \oddsidemargin 150pt \rfoot{} \cfoot{} \rhead{} \chead{\Large\thepage} \renewcommand {\headrulewidth}{0pt} \renewcommand {\footrulewidth}{0pt} '  --pagecommand '\thispagestyle{fancy}' -o "pagenum_$1" "$1"
 }
 mkalias_with_prefix 'pdf_pagenum'
 
 pdf_contrast_correct()
 {
-	pdfjam  --preamble '\usepackage{fancyhdr} \pagestyle{fancy} \topmargin -65pt \oddsidemargin 150pt \rfoot{} \cfoot{} \rhead{} \chead{\Large\thepage} \renewcommand {\headrulewidth}{0pt} \renewcommand {\footrulewidth}{0pt} '  --pagecommand '\thispagestyle{fancy}' -o "pagenum_$1" "$1"
+    [ $1 == '' ] && printf "Корректировка контраста в pdf\nОшибка! Укажите входной файл\n" && return
+    mkdir tmp
+    convert -density 300 $1 tmp/output-%03d.jpg
+    convert tmp/output*.jpg -normalize -threshold 60%  tmp/final-%03d.jpg
+    # convert tmp/output*.jpg -level 0% tmp/final-%03d.jpg
+    convert tmp/final*.jpg new_$1
 }
 mkalias_with_prefix 'pdf_contrast_correct'
 
 pdf_gamma_correct()
 {
-	gamma=$2
-	[ gamma == '' ] && gamma=3
+    [ $1 == '' ] && printf "Корректировка гаммы в pdf\nОшибка! Укажите входной файл\n\nВходные параметры: file gamma\n" && return
+    gamma=$2
+    [ gamma == '' ] && gamma=3 && printf "Выбрана гамма '${gamma}'"
 
 	mkdir tmp
 	convert -density 300 $1 tmp/output-%03d.jpg
@@ -47,7 +56,7 @@ mkalias_with_prefix 'pdf_gamma_correct'
 pdf_all_to_one_file()
 {
 	in_files_pattern=$1
-	[ in_files_pattern == '' ] && in_files_pattern='*.pdf'
+	[ in_files_pattern == '' ] && in_files_pattern='*.pdf' && printf "Выбран шаблон '${in_files_pattern}'\n"
 
 	convert -density 300 "${in_files_pattern}" -density 300 all.pdf
 }
@@ -57,12 +66,14 @@ alias ${prefix}archive_each_file_into_separate_archive="find . -mindepth 1 -maxd
 
 unicode_U200B_correct ()
 {
+    [ $1 == '' ] && printf "Корректировка ошибки в latex U200B\nУкажите входной файл" && return
 	perl -CSD -pe "s/\N{U+200B}//gu" < $1 > noU200B_$1
 }
 mkalias_with_prefix 'unicode_U200B_correct'
 
 festival_txt2mp3 ()
 {
+    [ $1 == '' ] && printf "Озвучивание текста\nУкажите входной текстовый файл. Выходной будет с тем же именем, но mp3\n" && return
 	in_file=$1
 	out_wav_file_name="$1.wav"
 	out_mp3_file_name="$1.mp3"
@@ -74,6 +85,7 @@ mkalias_with_prefix 'festival_txt2mp3'
 
 encode_240()
 {
+    [ $1 == '' ] && printf "Перекодирование видео в формат 240*180\nУкажите входной шаблон. Например '*.mp4'\n" && return
 	for filename in "$1"; do 
 		echo "Take '${filename}'"; 
 		if [ -f "${filename}" ]; then
@@ -86,6 +98,7 @@ mkalias_with_prefix 'encode_240'
 
 union_video_and_audio()
 {
+    [ $1 == '' ] && printf "Объедидение видео и аудио\nУкажите входной файл видео и аудио. Например: 1.mp4 1.wav\n" && return
 	ffmpeg -i $1  -i $2 -c:a aac -b:a 128k -vcodec copy -map 0:v -map 1:a o.mp4
 }
 mkalias_with_prefix 'union_video_and_audio'
@@ -128,7 +141,7 @@ download_custom()
 }
 mkalias_with_prefix 'download_custom'
 
-alias ${prefix}gen_password='openssl rand -base64 10'
+alias ${prefix}gen_password='pwgen -n 16'
 
 cur_dir=${alias_dir}
 alias parse_arg_lib='${cur_dir}/../video_tools/parse_arg_lib'
@@ -137,21 +150,21 @@ alias ${prefix}union_video_and_audio='${cur_dir}/../video_tools/union_video_and_
 
 all_to_djvu()
 {
-	in_files_pattern=$1
-	[ in_files_pattern == '' ] && in_files_pattern='*JPG'
-	for i in ${in_files_pattern}; do bmptopnm $i > pnm/$i.pnm; done
-	for i in *; do c44 -dpi 300 -slice 60+7+7 $i $i.djvu; done
-	djvm -c new.djvu *.djvu
+    [ ${in_files_pattern} == '' ] && printf "Объедидение файлов в djvu\nУкажите входной шаблон. Например '*.jpg'\n" && return
+    in_files_pattern=$1
+    for i in ${in_files_pattern}; do bmptopnm $i > pnm/$i.pnm; done
+    for i in *; do c44 -dpi 300 -slice 60+7+7 $i $i.djvu; done
+    djvm -c new.djvu *.djvu
 }
 mkalias_with_prefix 'all_to_djvu'
 
 resize_and_del_exif()
 {
     search_template=$1
-    [ "${search_template}" = "" ] && search_template="./*.JPG"
+    [ "${search_template}" == '' ] && printf "Изменение размера и удаление exif\nУкажите входной шаблон файлов и ширину. Например: '*.jpg' 1024\n" && return
 
     image_width=$2
-    [ "${image_width}" = "" ] && image_width="1024"
+    [ "${image_width}" = "" ] && image_width="1024" && printf "Выбрана ширина '${image_width}'\n"
 
     for entry in "$search_template"
     do
@@ -164,21 +177,41 @@ mkalias_with_prefix 'resize_and_del_exif'
 ssh_del_known_host()
 {
 	in_host_pattern=$1
-	if [ "${in_host_pattern}" = "" ]; then 
-	    echo 'Укажите шаблон адреса, например "192.168.1.*"'
-	    return
-	fi
-    echo "cp ~/.ssh/known_hosts ~/.ssh/known_hosts.backup && cat ~/.ssh/known_hosts.backup | grep -v ${in_host_pattern} > ~/.ssh/known_hosts"
-
+	[ "${in_dev}" = "" ] && printf "Укажите шаблон адреса, например '192.168.1.'\n" && return
+    eval "sudo cp -u ~/.ssh/known_hosts ~/.ssh/known_hosts.backup && cat ~/.ssh/known_hosts.backup | grep -v ${in_host_pattern} > ~/.ssh/known_hosts"
 }
 mkalias_with_prefix 'ssh_del_known_host'
 
-
-ssh_openwpt_10()
+ssh_for_openwpt_10.3_kamikadze()
 {
 	in_host_pattern=$1
     ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c 3des-cbc ${in_host_pattern}
 
 }
-mkalias_with_prefix 'ssh_openwpt_10'
+mkalias_with_prefix 'ssh_for_openwpt_10.3_kamikadze'
+
+hdd_fill_zero()
+{
+    in_dev=$1
+    [ "${in_dev}" = "" ] && printf "Заполнить диск нулями.\nОшибка! Укажите файл устройства. Например /dev/sdb.\n" && return
+    sudo pv < /dev/zero > ${in_dev}
+}
+mkalias_with_prefix 'hdd_fill_zero'
+
+hdd_fill_random()
+{
+    in_dev=$1
+    [ "${in_dev}" = "" ] && printf "Заполнить диск рандомом.\nОшибка! Укажите файл устройства. Например /dev/sdb.\n" && return
+    sudo pv < /dev/urandom > ${in_dev}
+}
+mkalias_with_prefix 'hdd_fill_random'
+
+hdd_check_zero()
+{
+	in_dev=$1
+    [ "${in_dev}" = "" ] && printf "Проверить, что диск заполнен нулями.\nОшибка! Укажите файл устройства. Например /dev/sdb.\n" && return
+    sudo pv ${in_dev} | od | head
+}
+mkalias_with_prefix 'hdd_check_zero'
+
 
