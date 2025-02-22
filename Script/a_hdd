@@ -1,0 +1,29 @@
+#!/bin/bash
+
+
+hdd_fill_zero()
+{
+    in_dev=$1
+    [ "${in_dev}" = "" ] && printf "Заполнить диск нулями.\nОшибка! Укажите файл устройства. Например /dev/sdb.\n" && return
+    sudo pv < /dev/zero > ${in_dev}
+}
+mkalias_with_prefix 'hdd_fill_zero'
+
+hdd_fill_random()
+{
+    in_dev=$1
+    [ "${in_dev}" = "" ] && printf "Заполнить диск рандомом.\nОшибка! Укажите файл устройства. Например /dev/sdb.\n" && return
+    sudo pv < /dev/urandom > ${in_dev}
+}
+mkalias_with_prefix 'hdd_fill_random'
+
+hdd_check_zero()
+{
+	in_dev=$1
+    [ "${in_dev}" = "" ] && printf "Проверить, что диск заполнен нулями.\nОшибка! Укажите файл устройства. Например /dev/sdb.\n" && return
+    sudo pv ${in_dev} | od | head
+}
+mkalias_with_prefix 'hdd_check_zero'
+
+
+

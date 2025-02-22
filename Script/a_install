@@ -1,0 +1,88 @@
+#!/bin/bash
+
+install_alt_linux_enable_sshd()
+{
+    printf "Запуск sshd\n"
+    sudo systemctl enable --now sshd.service
+}
+mkalias_with_prefix 'install_alt_linux_enable_sshd'
+
+install_alt_linux_system_full_upgrade()
+{
+    printf "Полное обновление системы\n"
+    sudo apt-get update
+    sudo apt-get dist-upgrade
+    sudo update-kernel
+}
+mkalias_with_prefix 'install_alt_linux_system_full_upgrade'
+
+install_alt_linux_defaults()
+{
+ printf "Установка важных программ\n"
+ sudo apt-get install \
+ pwgen xclip audacious audacity \
+ gparted testdisk gnome-disk-utility baobab pv \
+ cpu-x gnome-system-monitor \
+ wol sshfs traceroute encfs openssh-server nmap\
+ remmina xrdp qbittorrent \
+ filezilla \
+ geany geany-plugins screen git gitg gitk git-cola  \
+ golang sqlite3 nodejs \
+ build-environment ctest gcc-c++ gcc clang \
+ flex libncurses-devel \
+ gimp pinta mypaint xviewer \
+ firefox dillo links2 \
+ vlc smtube mpv mplayer-gui ffmpeg cheese \
+ redshift stellarium \
+ minetest\
+ texlive texstudio \
+ systemd-settings-disable-kill-user-processes \
+ retext pdfmod \
+ gedit gedit-plugins gedit-plugin-devhelp gedit-plugins-latex \
+ cinnamon-full idesk icewm pcmanfm volumeicon mc \
+ nemo nemo-image-converter nemo-sendto-clamtk
+ nemo-arronax nemo-preview nemo-share \
+ nemo-beesu-manager nemo-preview-gir-devel nemo-share-common \
+ nemo-extensions-translations nemo-python nemo-terminal \
+ nemo-fileroller nemo-python-devel nemo-translations \
+ photorec\
+ mp3info\
+ frescobaldi lilypond \
+ nano\
+ token-manager \
+ libgtop-gir libgtop-gir-devel \
+ inkscape inkscape-viewer \
+ meld kdiff3 \
+ python3-module-pip \
+ NetworkManager-tui \
+ flatpak
+}
+mkalias_with_prefix 'install_alt_linux_defaults'
+
+install_alt_linux_skype_telegram_zoom()
+{
+    printf "Установка skype telegram zoom\n"
+    epm play skype
+    epm play telegram
+    epm play zoom
+}
+mkalias_with_prefix 'install_alt_linux_skype_telegram_zoom'
+
+
+install_linux_mint_default()
+{
+    sudo aptitude install chromium-browser gimp geany geany-plugins screen \
+ gcc virtualbox-qt virtualbox-ext-pack icewm idesk dillo links2 smtube \
+ vlc mpv mc openssh-server mplayer-gui texstudio volumeicon-alsa \
+ p7zip-full git falkon ffmpeg remmina remmina-plugin-rdp xrdp \
+ remmina-plugin-vnc nmap gparted lxterminal redshift stellarium \
+ minetest widelands chromium-browser-l10n sshfs encfs\
+ pcmanfm xclip clang clang-4.0 clang-3.9 gitg gitk git-cola \
+ texlive-full pwgen mmv cheese gxneur xneur tuxguitar audacious \
+ deluge easystroke
+
+    sudo apt install --install-recommends winehq-stable
+}
+mkalias_with_prefix 'install_linux_mint_default'
+
+

@@ -1,0 +1,57 @@
+#!/bin/bash
+
+pdf_a5()
+{
+    [ $1 == '' ] && printf "Преобразование pdf к формату А5\nОшибка! Укажите входной файл\n" && return
+    pdfjam "$1" --scale 0.71 --offset '0 50mm' -o "a5_$1"
+}
+mkalias_with_prefix 'pdf_a5'
+
+pdf_a6()
+{
+    [ $1 == '' ] && printf "Преобразование pdf к формату А6\nОшибка! Укажите входной файл\n" && return
+    pdfjam "$1" --scale 0.5 --offset '0 75mm' -o "a6_$1"
+}
+mkalias_with_prefix 'pdf_a6'
+
+pdf_pagenum()
+{
+    [ $1 == '' ] && printf "Добавить номер страницы в pdf\nОшибка! Укажите входной файл\n" && return
+    pdfjam  --preamble '\usepackage{fancyhdr} \pagestyle{fancy} \topmargin -65pt \oddsidemargin 150pt \rfoot{} \cfoot{} \rhead{} \chead{\Large\thepage} \renewcommand {\headrulewidth}{0pt} \renewcommand {\footrulewidth}{0pt} '  --pagecommand '\thispagestyle{fancy}' -o "pagenum_$1" "$1"
+}
+mkalias_with_prefix 'pdf_pagenum'
+
+pdf_contrast_correct()
+{
+    [ $1 == '' ] && printf "Корректировка контраста в pdf\nОшибка! Укажите входной файл\n" && return
+    mkdir tmp
+    convert -density 300 $1 tmp/output-%03d.jpg
+    convert tmp/output*.jpg -normalize -threshold 60%  tmp/final-%03d.jpg
+    # convert tmp/output*.jpg -level 0% tmp/final-%03d.jpg
+    convert tmp/final*.jpg new_$1
+}
+mkalias_with_prefix 'pdf_contrast_correct'
+
+pdf_gamma_correct()
+{
+    [ $1 == '' ] && printf "Корректировка гаммы в pdf\nОшибка! Укажите входной файл\n\nВходные параметры: file gamma\n" && return
+    gamma=$2
+    [ gamma == '' ] && gamma=3 && printf "Выбрана гамма '${gamma}'"
+
+	mkdir tmp
+	convert -density 300 $1 tmp/output-%03d.jpg
+	convert tmp/output*.jpg -gamma ${gamma} tmp/final-%03d.jpg
+	# convert tmp/output*.jpg -level 0% tmp/final-%03d.jpg
+	convert tmp/final*.jpg new_$1
+}
+mkalias_with_prefix 'pdf_gamma_correct'
+
+pdf_all_to_one_file()
+{
+	in_files_pattern=$1
+	[ in_files_pattern == '' ] && in_files_pattern='*.pdf' && printf "Выбран шаблон '${in_files_pattern}'\n"
+
+	convert -density 300 "${in_files_pattern}" -density 300 all.pdf
+}
+mkalias_with_prefix 'pdf_all_to_one_file'
+
