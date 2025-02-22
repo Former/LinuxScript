@@ -2,7 +2,7 @@
 # Ubuntu
 #sudo apt-get install gcc-multilib g++-multilib git libncurses-dev gawk perl python3-distutils
 #-sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.12 10
-# AltLinux
+# AltLinux - не удалось запустить
 #sudo apt-get install perl-IPC-Cmd perl-CPAN
 #cpan JSON
 

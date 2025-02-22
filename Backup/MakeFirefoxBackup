@@ -13,6 +13,7 @@ fi
 cd ~
 tar cvpzf "${backup_dir}/$(hostname)_mozilla_backup_$(date +%yy%mm%dd-%Hh%Mm%Ss).tgz" \
 --exclude=.mozilla/firefox/*.*/Cache \
---exclude=.mozilla/firefox/*.*/storage \
 .mozilla
+
+#--exclude=.mozilla/firefox/*.*/storage \
 
