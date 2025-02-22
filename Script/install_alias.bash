@@ -2,5 +2,7 @@
 
 cur_dir=$(pwd)
 
-echo "alias_dir='${cur_dir}'" >> ~/.bashrc
-echo "source ${cur_dir}/alias_config" >> ~/.bashrc
+alias_dir="${cur_dir}/Script"
+
+echo "alias_dir='${alias_dir}'" >> ~/.bashrc
+echo "source ${alias_dir}/alias_main" >> ~/.bashrc
