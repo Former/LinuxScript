@@ -3,6 +3,7 @@
 install_alt_linux_enable_sshd()
 {
     printf "Запуск sshd\n"
+    ask_continue && return
     sudo systemctl enable --now sshd.service
 }
 mkalias_with_prefix 'install_alt_linux_enable_sshd'
@@ -10,6 +11,7 @@ mkalias_with_prefix 'install_alt_linux_enable_sshd'
 install_alt_linux_system_full_upgrade()
 {
     printf "Полное обновление системы\n"
+    ask_continue && return
     sudo apt-get update
     sudo apt-get dist-upgrade
     sudo update-kernel
@@ -20,53 +22,270 @@ install_alt_linux_defaults()
 {
  printf "Установка важных программ\n"
  sudo apt-get install \
- pwgen xclip audacious audacity \
- gparted testdisk gnome-disk-utility baobab pv \
- cpu-x gnome-system-monitor \
- wol sshfs traceroute encfs openssh-server nmap\
- remmina xrdp qbittorrent \
- filezilla \
- geany geany-plugins screen git gitg gitk git-cola  \
- golang sqlite3 nodejs \
- build-environment ctest gcc-c++ gcc clang \
- flex libncurses-devel \
- gimp pinta mypaint xviewer \
- firefox dillo links2 \
- vlc smtube mpv mplayer-gui ffmpeg cheese \
- redshift stellarium \
- minetest\
- texlive texstudio \
- systemd-settings-disable-kill-user-processes \
- retext pdfmod \
- gedit gedit-plugins gedit-plugin-devhelp gedit-plugins-latex \
- cinnamon-full idesk icewm pcmanfm volumeicon mc \
- nemo nemo-image-converter nemo-sendto-clamtk
- nemo-arronax nemo-preview nemo-share \
- nemo-beesu-manager nemo-preview-gir-devel nemo-share-common \
- nemo-extensions-translations nemo-python nemo-terminal \
- nemo-fileroller nemo-python-devel nemo-translations \
- photorec\
- mp3info\
- frescobaldi lilypond \
- nano\
- token-manager \
- libgtop-gir libgtop-gir-devel \
- inkscape inkscape-viewer \
- meld kdiff3 \
- python3-module-pip \
- NetworkManager-tui \
- flatpak
+     pwgen xclip audacious audacity \
+     gparted testdisk gnome-disk-utility baobab pv \
+     cpu-x gnome-system-monitor \
+     wol sshfs traceroute encfs openssh-server nmap\
+     remmina xrdp qbittorrent \
+     filezilla \
+     geany geany-plugins screen git gitg gitk git-cola  \
+     golang sqlite3 nodejs \
+     build-environment ctest gcc-c++ gcc clang \
+     flex libncurses-devel \
+     gimp pinta mypaint xviewer \
+     firefox dillo links2 \
+     vlc smtube mpv mplayer-gui ffmpeg cheese \
+     redshift stellarium \
+     minetest\
+     texlive texstudio \
+     systemd-settings-disable-kill-user-processes \
+     retext pdfmod \
+     gedit gedit-plugins gedit-plugin-devhelp gedit-plugins-latex \
+     cinnamon-full idesk icewm pcmanfm volumeicon mc \
+     nemo nemo-image-converter nemo-sendto-clamtk
+     nemo-arronax nemo-preview nemo-share \
+     nemo-beesu-manager nemo-preview-gir-devel nemo-share-common \
+     nemo-extensions-translations nemo-python nemo-terminal \
+     nemo-fileroller nemo-python-devel nemo-translations \
+     photorec\
+     mp3info\
+     frescobaldi lilypond \
+     nano\
+     token-manager \
+     libgtop-gir libgtop-gir-devel \
+     inkscape inkscape-viewer \
+     meld kdiff3 \
+     python3-module-pip \
+     NetworkManager-tui \
+     flatpak\
+     tlp
 }
 mkalias_with_prefix 'install_alt_linux_defaults'
 
 install_alt_linux_skype_telegram_zoom()
 {
     printf "Установка skype telegram zoom\n"
+    ask_continue && return
     epm play skype
     epm play telegram
     epm play zoom
 }
 mkalias_with_prefix 'install_alt_linux_skype_telegram_zoom'
+
+install_gedit_duplicate_plugin()
+{
+    printf "Установка плагина duplicate (CTRL+SHIFT+d)\n"
+    ask_continue && return
+    dir=~/.local/share/gedit/plugins/
+    mkdir "${dir}"
+    cd ~/.local/share/gedit/plugins/ && git clone https://github.com/hannenz/duplicate
+}
+mkalias_with_prefix 'install_gedit_duplicate_plugin'
+
+install_gedit_duplicate_plugin()
+{
+    printf "Установка плагина duplicate (CTRL+SHIFT+d)\n"
+    ask_continue && return
+    dir=~/.local/share/gedit/plugins/
+    mkdir "${dir}"
+    cd ~/.local/share/gedit/plugins/ && git clone https://github.com/hannenz/duplicate
+}
+mkalias_with_prefix 'install_gedit_duplicate_plugin'
+
+
+install_n2n()
+{
+    printf "Установка n2n\n"
+    ask_continue && return
+    # n2n
+    wget https://github.com/ntop/n2n/releases/download/3.0/n2n-3.0.0-1038.x86_64.rpm
+    sudo apt-get install ./n2n-3.0.0-1038.x86_64.rpm
+}
+mkalias_with_prefix 'install_n2n'
+
+install_n2n_alt_rpi()
+{
+    printf "Установка n2n\n"
+    ask_continue && return
+    # n2n rpi altlinux
+    wget https://packages.ntop.org/RaspberryPI/bullseye_pi/arm64/n2n/n2n_3.1.1-76-g709590d_arm64.deb
+    sudo epm -i ./n2n_3.1.1-76-g709590d_arm64.deb
+}
+mkalias_with_prefix 'install_n2n_alt_rpi'
+
+install_n2n_enable()
+{
+    printf "Запуск n2n\n"
+    ask_continue && return
+    sudo systemctl enable --now edge.service 
+}
+mkalias_with_prefix 'install_n2n_enable'
+
+install_flathub_add()
+{
+    printf "Добавление репозитория flathub\n"
+    ask_continue && return
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+}
+mkalias_with_prefix 'install_flathub_add'
+
+install_flatpak_organicmaps()
+{
+    printf "Установка organicmaps\n"
+    ask_continue && return
+    ## organicmaps
+    flatpak install flathub app.organicmaps.desktop
+    #flatpak remote-info --log flathub app.organicmaps.desktop
+    #sudo flatpak update --commit=beb1e1a66d50646cfe162437bca7b19fdd9178e3f505fcdc351a74415dbca628 app.organicmaps.desktop
+    #flatpak run app.organicmaps.desktop
+}
+mkalias_with_prefix 'install_flatpak_organicmaps'
+
+install_flatpak_appimagepool()
+{
+    printf "Установка appimagepool\n"
+    ask_continue && return
+    flatpak install flathub io.github.prateekmedia.appimagepool
+}
+mkalias_with_prefix 'install_flatpak_appimagepool'
+
+install_flatpak_AndroidStudio()
+{
+    printf "Установка AndroidStudio\n"
+    ask_continue && return
+    # AndroidStudio
+    flatpak install flathub com.google.AndroidStudio
+}
+mkalias_with_prefix 'install_flatpak_AndroidStudio'
+
+install_XnConvert()
+{
+    printf "Установка XnConvert\n"
+    #ask_continue && return
+    # XnConvert
+    echo 'Download: https://www.xnview.com/en/xnconvert/#downloads'
+    echo 'sudo epm install ./XnConvert-linux-x64.deb'
+}
+mkalias_with_prefix 'install_XnConvert'
+
+install_tuxguitar()
+{
+    printf "Установка tuxguitar\n"
+    ask_continue && return
+    # tuxguitar
+    wget -c https://github.com/helge17/tuxguitar/releases/download/1.6.0/tuxguitar-1.6.0_linux-swt.x86_64.rpm
+    sudo apt-get install ./tuxguitar-1.6.0_linux-swt.x86_64.rpm
+}
+mkalias_with_prefix 'install_tuxguitar'
+
+install_Gps()
+{
+    printf "Установка Gps\n"
+    ask_continue && return
+    # Gps
+    sudo apt-get install xgps gpsd gpsmon
+    echo 'Запишите в /etc/sysconfig/gpsd ->
+    OPTIONS="-n"
+    DEVICES="/dev/ttyACM0 /dev/ttyACM1"'
+}
+mkalias_with_prefix 'install_Gps'
+
+install_thinkfan()
+{
+    printf "Установка thinkfan\n"
+    ask_continue && return
+    # thinkpad
+    sudo apt-get install thinkfan
+    echo "options thinkpad_acpi fan_control=1" > /etc/modprobe.d/thinkpad_acpi.conf
+    echo 'Запишите в mcedit /etc/thinkfan.conf ->
+    tp_fan /proc/acpi/ibm/fan
+    hwmon /sys/class/thermal/thermal_zone0/temp
+    (0, 0,  60) 
+    (1, 53, 65) 
+    (2, 55, 66) 
+    (3, 57, 68) 
+    (4, 61, 70) 
+    (5, 64, 71) 
+    (7, 68, 32767)
+    # test: 
+    sudo /usr/sbin/thinkfan -n
+    # run: 
+    systemctl enable --now thinkfan.service
+    '
+}
+mkalias_with_prefix 'install_thinkfan'
+
+install_max_freq()
+{
+    printf "Установка максимальной частоты процессора\n"
+    ask_continue && return
+    # Set max freq
+    echo 'Выполнить
+    EDITOR=mcedit crontab -e
+    Записать туда
+    @reboot cpupower frequency-set --max 2.3G'
+}
+mkalias_with_prefix 'install_max_freq'
+
+install_git_editor_set()
+{
+    printf "Установка git_editor\n"
+    ask_continue && return
+    # git
+    git config --global core.editor mcedit
+}
+mkalias_with_prefix 'install_git_editor_set'
+
+install_disable_autostart_gnome_software()
+{
+    printf "Отключить автозапуск gnome_software\n"
+    ask_continue && return
+    # Disable autostart gnome-software
+    mkdir -pv ~/.config/autostart && cp /etc/xdg/autostart/gnome-software-service.desktop ~/.config/autostart/
+    echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/gnome-software-service.desktop
+    dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
+
+    dconf write /org/gnome/software/allow-updates false
+    dconf write /org/gnome/software/download-updates false
+}
+mkalias_with_prefix 'install_disable_autostart_gnome_software'
+
+install_fuse_config()
+{
+    printf "Установка возможности пользоваться fusermount обычным пользователям для AltLinux\n"
+    ask_continue && return
+    # Fuse config
+    sudo control fusermount public
+}
+mkalias_with_prefix 'install_fuse_config'
+
+install_wifi_for_Android_13_in_altlinux()
+{
+    printf "Установка возможности пользоваться fusermount обычным пользователям для AltLinux\n"
+    ask_continue && return
+    # Enable wi-fi for Android 13 in altlinux
+    nmcli connection modify WIFINAME wifi-sec.pmf 1
+}
+mkalias_with_prefix 'install_wifi_for_Android_13_in_altlinux'
+
+install_set_macperf_andcharge_80()
+{
+    printf "Максимальная производительность и заряд в 80%\n"
+    ask_continue && return
+    # Установить максимальный уровень заряда и поизводительности
+    #sudo apt-get install tlp
+    sudo echo "80" > /sys/class/power_supply/BAT0/charge_control_end_threshold
+    sudo echo "80" > /sys/devices/system/cpu/intel_pstate/max_perf_pct
+}
+mkalias_with_prefix 'install_set_macperf_andcharge_80'
+
+install_headers()
+{
+    printf "Установка заголовков для исходного кода ядра linux-headers\n"
+    ask_continue && return
+    sudo apt-get install linux-headers-`uname -r` 
+}
+mkalias_with_prefix 'install_headers'
 
 
 install_linux_mint_default()
@@ -85,4 +304,19 @@ install_linux_mint_default()
 }
 mkalias_with_prefix 'install_linux_mint_default'
 
+install_linux_mint_python2_7()
+{
+    # LinuxMint 24
+    wget "https://archive.ubuntu.com/ubuntu/pool/universe/p/python2.7/libpython2.7_2.7.18-13ubuntu1.5_amd64.deb"
 
+    wget "https://archive.ubuntu.com/ubuntu/pool/universe/p/python2.7/libpython2.7-stdlib_2.7.18-13ubuntu1.5_amd64.deb"
+
+    wget "https://archive.ubuntu.com/ubuntu/pool/universe/p/python2.7/python2.7-minimal_2.7.18-13ubuntu1.5_amd64.deb"
+
+    wget "https://archive.ubuntu.com/ubuntu/pool/universe/p/python2.7/libpython2.7-minimal_2.7.18-13ubuntu1.5_amd64.deb"
+
+    sudo apt-get install libnsl2
+
+    sudo dpkg -i python2.7-minimal_2.7.18-13ubuntu1.5_amd64.deb libpython2.7_2.7.18-13ubuntu1.5_amd64.deb libpython2.7-stdlib_2.7.18-13ubuntu1.5_amd64.deb libpython2.7-minimal_2.7.18-13ubuntu1.5_amd64.deb
+}
+mkalias_with_prefix 'install_linux_mint_python2_7'

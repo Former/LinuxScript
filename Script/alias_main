@@ -7,6 +7,17 @@ mkalias_with_prefix()
     alias ${prefix}$1="$1"
 }
 
+ask_continue()
+{
+    read -p "Продолжить [Y/n]?:" answ 
+    if [[ "${answ}" == "n" || "${answ}" == "N" ]]; then 
+        echo "Отменено" 
+        return 0
+    fi
+    return 1
+}
+
+
 source "${alias_dir}/a_install"
 source "${alias_dir}/a_pdf"
 source "${alias_dir}/a_hdd"
@@ -16,39 +27,39 @@ alias ${prefix}archive_each_file_into_separate_archive="find . -mindepth 1 -maxd
 unicode_U200B_correct ()
 {
     [ $1 == '' ] && printf "Корректировка ошибки в latex U200B\nУкажите входной файл" && return
-	perl -CSD -pe "s/\N{U+200B}//gu" < $1 > noU200B_$1
+    perl -CSD -pe "s/\N{U+200B}//gu" < $1 > noU200B_$1
 }
 mkalias_with_prefix 'unicode_U200B_correct'
 
 festival_txt2mp3 ()
 {
     [ $1 == '' ] && printf "Озвучивание текста\nУкажите входной текстовый файл. Выходной будет с тем же именем, но mp3\n" && return
-	in_file=$1
-	out_wav_file_name="$1.wav"
-	out_mp3_file_name="$1.mp3"
-	cat "$1" | sed 's/[^a-zA-ZА-Яа-я0-9., ]//g' | text2wave -o "$out_wav_file_name"
-	lame "$out_wav_file_name" "$out_mp3_file_name"
-	rm "$out_wav_file_name"
+    in_file=$1
+    out_wav_file_name="$1.wav"
+    out_mp3_file_name="$1.mp3"
+    cat "$1" | sed 's/[^a-zA-ZА-Яа-я0-9., ]//g' | text2wave -o "$out_wav_file_name"
+    lame "$out_wav_file_name" "$out_mp3_file_name"
+    rm "$out_wav_file_name"
 }
 mkalias_with_prefix 'festival_txt2mp3'
 
 encode_240()
 {
     [ $1 == '' ] && printf "Перекодирование видео в формат 240*180\nУкажите входной шаблон. Например '*.mp4'\n" && return
-	for filename in "$1"; do 
-		echo "Take '${filename}'"; 
-		if [ -f "${filename}" ]; then
-			echo "Make '${filename}'"; 
-			ffmpeg -i "${filename}" -vcodec libx264 -vb 50K -s 240x180 -acodec libmp3lame -ab 16K -strict -2 "${filename}_240.mkv"
-		fi
-	done
+    for filename in "$1"; do 
+        echo "Take '${filename}'"; 
+        if [ -f "${filename}" ]; then
+            echo "Make '${filename}'"; 
+            ffmpeg -i "${filename}" -vcodec libx264 -vb 50K -s 240x180 -acodec libmp3lame -ab 16K -strict -2 "${filename}_240.mkv"
+        fi
+    done
 }
 mkalias_with_prefix 'encode_240'
 
 union_video_and_audio()
 {
     [ $1 == '' ] && printf "Объедидение видео и аудио\nУкажите входной файл видео и аудио. Например: 1.mp4 1.wav\n" && return
-	ffmpeg -i $1  -i $2 -c:a aac -b:a 128k -vcodec copy -map 0:v -map 1:a o.mp4
+    ffmpeg -i $1  -i $2 -c:a aac -b:a 128k -vcodec copy -map 0:v -map 1:a o.mp4
 }
 mkalias_with_prefix 'union_video_and_audio'
 
@@ -57,36 +68,36 @@ alias ${prefix}download_yt_dlp="${vd}"
 
 download_worst()
 {
-	cmd="${vd} -f 'worst/worstvideo+worstaudio' -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $1"
-	eval $cmd
+    cmd="${vd} -f 'worst/worstvideo+worstaudio' -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $1"
+    eval $cmd
 }
 mkalias_with_prefix 'download_worst'
 
 download_best()
 {
-	cmd="${vd} -f 'best/bestvideo+bestaudio' -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $1"
-	eval $cmd
+    cmd="${vd} -f 'best/bestvideo+bestaudio' -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $1"
+    eval $cmd
 }
 mkalias_with_prefix 'download_best'
 
 download_worst_audio()
 {
-	cmd="${vd} -f 'worstaudio' -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $1"
-	eval $cmd
+    cmd="${vd} -f 'worstaudio' -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $1"
+    eval $cmd
 }
 mkalias_with_prefix 'download_worst_audio'
 
 download_format_list()
 {
-	cmd="${vd} -F $1"
-	eval $cmd
+    cmd="${vd} -F $1"
+    eval $cmd
 }
 mkalias_with_prefix 'download_format_list'
 
 download_custom()
 {
-	cmd="${vd} -f $1 -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $2"
-	eval $cmd
+    cmd="${vd} -f $1 -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $2"
+    eval $cmd
 }
 mkalias_with_prefix 'download_custom'
 
@@ -125,15 +136,15 @@ mkalias_with_prefix 'resize_and_del_exif'
 
 ssh_del_known_host()
 {
-	in_host_pattern=$1
-	[ "${in_host_pattern}" = "" ] && printf "Укажите шаблон адреса, например '192.168.1.'\n" && return
+    in_host_pattern=$1
+    [ "${in_host_pattern}" = "" ] && printf "Укажите шаблон адреса, например '192.168.1.'\n" && return
     eval "sudo cp -u ~/.ssh/known_hosts ~/.ssh/known_hosts.backup && cat ~/.ssh/known_hosts.backup | grep -v ${in_host_pattern} > ~/.ssh/known_hosts"
 }
 mkalias_with_prefix 'ssh_del_known_host'
 
 ssh_for_openwpt_10.3_kamikadze()
 {
-	in_host_pattern=$1
+    in_host_pattern=$1
     ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c 3des-cbc ${in_host_pattern}
 
 }
@@ -141,8 +152,25 @@ mkalias_with_prefix 'ssh_for_openwpt_10.3_kamikadze'
 
 rand_string()
 {
-	tr -dc A-Za-z0-9 < /dev/urandom | dd bs=${RANDOM:1:2} count=1 2>/dev/null
+    tr -dc A-Za-z0-9 < /dev/urandom | dd bs=${RANDOM:1:2} count=1 2>/dev/null
 }
 mkalias_with_prefix 'rand_string'
+
+
+check_internet_script()
+{
+    host="ya.ru"
+
+    while true; do
+    result=$(ping -c 3 $host | tail -2 | head -1 | awk '{print $4}')
+    if [ $result -eq 0 ]; then
+        echo "Нет интернета"
+    break
+    fi
+        sleep 180
+    done
+}
+mkalias_with_prefix 'check_internet_script'
+
 
 
