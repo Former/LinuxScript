@@ -1,0 +1,48 @@
+#!/bin/bash
+
+alias ${prefix}archive_each_file_into_separate_archive="find . -mindepth 1 -maxdepth 1 -type f -exec tar -cvzf 'out/{}.tgz' '{}' \;"
+
+unicode_U200B_correct ()
+{
+    [ $1 == '' ] && printf "Корректировка ошибки в latex U200B\nУкажите входной файл" && return
+    perl -CSD -pe "s/\N{U+200B}//gu" < $1 > noU200B_$1
+}
+mkalias_with_prefix 'unicode_U200B_correct'
+
+festival_txt2mp3 ()
+{
+    [ $1 == '' ] && printf "Озвучивание текста\nУкажите входной текстовый файл. Выходной будет с тем же именем, но mp3\n" && return
+    in_file=$1
+    out_wav_file_name="$1.wav"
+    out_mp3_file_name="$1.mp3"
+    cat "$1" | sed 's/[^a-zA-ZА-Яа-я0-9., ]//g' | text2wave -o "$out_wav_file_name"
+    lame "$out_wav_file_name" "$out_mp3_file_name"
+    rm "$out_wav_file_name"
+}
+mkalias_with_prefix 'festival_txt2mp3'
+
+alias ${prefix}gen_password='pwgen -n 16'
+
+rand_string()
+{
+    tr -dc A-Za-z0-9 < /dev/urandom | dd bs=${RANDOM:1:2} count=1 2>/dev/null
+}
+mkalias_with_prefix 'rand_string'
+
+
+check_internet_script()
+{
+    host="ya.ru"
+
+    while true; do
+    result=$(ping -c 3 $host | tail -2 | head -1 | awk '{print $4}')
+    if [ $result -eq 0 ]; then
+        echo "Нет интернета"
+    break
+    fi
+        sleep 180
+    done
+}
+mkalias_with_prefix 'check_internet_script'
+
+

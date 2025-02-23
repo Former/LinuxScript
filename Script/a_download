@@ -1,0 +1,38 @@
+#!/bin/bash
+
+vd='~/.local/bin/yt-dlp'
+alias ${prefix}download_yt_dlp="${vd}"
+
+download_custom()
+{
+    cmd="${vd} -f $1 -R 10000 -i -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s' $2"
+    eval $cmd
+}
+mkalias_with_prefix 'download_custom'
+
+download_worst()
+{
+    download_custom 'worst/worstvideo+worstaudio' "$1"
+}
+mkalias_with_prefix 'download_worst'
+
+download_best()
+{
+    download_custom 'best/bestvideo+bestaudio' "$1"
+}
+mkalias_with_prefix 'download_best'
+
+download_worst_audio()
+{
+    download_custom 'worstaudio' "$1"
+}
+mkalias_with_prefix 'download_worst_audio'
+
+download_format_list()
+{
+    cmd="${vd} -F $1"
+    eval $cmd
+}
+mkalias_with_prefix 'download_format_list'
+
+

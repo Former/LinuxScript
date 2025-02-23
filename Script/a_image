@@ -1,0 +1,29 @@
+#!/bin/bash
+
+img_all_to_djvu()
+{
+    [ ${in_files_pattern} == '' ] && printf "Объедидение файлов в djvu\nУкажите входной шаблон. Например '*.jpg'\n" && return
+    in_files_pattern=$1
+    for i in ${in_files_pattern}; do bmptopnm $i > pnm/$i.pnm; done
+    for i in *; do c44 -dpi 300 -slice 60+7+7 $i $i.djvu; done
+    djvm -c new.djvu *.djvu
+}
+mkalias_with_prefix 'img_all_to_djvu'
+
+img_resize_and_del_exif()
+{
+    search_template=$1
+    [ "${search_template}" == '' ] && printf "Изменение размера и удаление exif\nУкажите входной шаблон файлов и ширину. Например: '*.jpg' 1024\n" && return
+
+    image_width=$2
+    [ "${image_width}" = "" ] && image_width="1024" && printf "Выбрана ширина '${image_width}'\n"
+
+    for entry in "$search_template"
+    do
+        echo "${entry}"
+        convert "${entry}" -resize ${image_width} -strip "new.jpg"
+    done
+}
+mkalias_with_prefix 'img_resize_and_del_exif'
+
+

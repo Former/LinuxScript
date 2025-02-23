@@ -1,0 +1,27 @@
+#!/bin/bash
+
+video_encode_240()
+{
+    [ $1 == '' ] && printf "Перекодирование видео в формат 240*180\nУкажите входной шаблон. Например '*.mp4'\n" && return
+    for filename in "$1"; do 
+        echo "Take '${filename}'"; 
+        if [ -f "${filename}" ]; then
+            echo "Make '${filename}'"; 
+            ffmpeg -i "${filename}" -vcodec libx264 -vb 50K -s 240x180 -acodec libmp3lame -ab 16K -strict -2 "${filename}_240.mkv"
+        fi
+    done
+}
+mkalias_with_prefix 'video_encode_240'
+
+video_union_video_and_audio()
+{
+    [ $1 == '' ] && printf "Объедидение видео и аудио\nУкажите входной файл видео и аудио. Например: 1.mp4 1.wav\n" && return
+    ffmpeg -i $1  -i $2 -c:a aac -b:a 128k -vcodec copy -map 0:v -map 1:a o.mp4
+}
+mkalias_with_prefix 'video_union_video_and_audio'
+
+
+cur_dir=${alias_dir}
+alias parse_arg_lib='${cur_dir}/../video_tools/parse_arg_lib'
+alias ${prefix}video_img_and_wav2video='${cur_dir}/../video_tools/img_and_wav2video'
+#alias ${prefix}video_union_video_and_audio='${cur_dir}/../video_tools/union_video_and_audio.bash'

@@ -18,7 +18,7 @@ install_alt_linux_system_full_upgrade()
 }
 mkalias_with_prefix 'install_alt_linux_system_full_upgrade'
 
-install_alt_linux_defaults()
+install_alt_linux_progs()
 {
  printf "Установка важных программ\n"
  sudo apt-get install \
@@ -58,9 +58,10 @@ install_alt_linux_defaults()
      python3-module-pip \
      NetworkManager-tui \
      flatpak\
-     tlp
+     tlp\
+     syncthing
 }
-mkalias_with_prefix 'install_alt_linux_defaults'
+mkalias_with_prefix 'install_alt_linux_progs'
 
 install_alt_linux_skype_telegram_zoom()
 {
@@ -92,13 +93,12 @@ install_gedit_duplicate_plugin()
 }
 mkalias_with_prefix 'install_gedit_duplicate_plugin'
 
-
 install_n2n()
 {
     printf "Установка n2n\n"
     ask_continue && return
     # n2n
-    wget https://github.com/ntop/n2n/releases/download/3.0/n2n-3.0.0-1038.x86_64.rpm
+    wget -c https://github.com/ntop/n2n/releases/download/3.0/n2n-3.0.0-1038.x86_64.rpm
     sudo apt-get install ./n2n-3.0.0-1038.x86_64.rpm
 }
 mkalias_with_prefix 'install_n2n'
@@ -108,7 +108,7 @@ install_n2n_alt_rpi()
     printf "Установка n2n\n"
     ask_continue && return
     # n2n rpi altlinux
-    wget https://packages.ntop.org/RaspberryPI/bullseye_pi/arm64/n2n/n2n_3.1.1-76-g709590d_arm64.deb
+    wget -c https://packages.ntop.org/RaspberryPI/bullseye_pi/arm64/n2n/n2n_3.1.1-76-g709590d_arm64.deb
     sudo epm -i ./n2n_3.1.1-76-g709590d_arm64.deb
 }
 mkalias_with_prefix 'install_n2n_alt_rpi'
@@ -261,10 +261,10 @@ mkalias_with_prefix 'install_fuse_config'
 
 install_wifi_for_Android_13_in_altlinux()
 {
-    printf "Установка возможности пользоваться fusermount обычным пользователям для AltLinux\n"
-    ask_continue && return
+    [ "$1" == "" ] printf "Установка возможности пользоваться fusermount обычным пользователям для AltLinux\nУкажите имя соединения\n" && return
+    WIFINAME=$1
     # Enable wi-fi for Android 13 in altlinux
-    nmcli connection modify WIFINAME wifi-sec.pmf 1
+    nmcli connection modify ${WIFINAME} wifi-sec.pmf 1
 }
 mkalias_with_prefix 'install_wifi_for_Android_13_in_altlinux'
 
