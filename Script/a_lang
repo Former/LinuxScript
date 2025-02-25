@@ -1,0 +1,41 @@
+#!/bin/bash
+
+lang_switch_custom()
+{
+    str="$1"
+    result="$str"
+    lang1="$2"
+    lang2="$3"
+    for (( i = 0; i < ${#result}; i++ )); do
+        word="${result:$i:1}"
+        for (( j = 0; j < ${#lang1}; j++ )); do
+            lang1_word="${lang1:$j:1}"
+            if [ "$word" = "$lang1_word" ]; then
+                lang2_word="${lang2:$j:1}"
+                result="${result:0:$i}${lang2_word}${result:$i+1}"
+            fi
+        done
+    done
+    echo "${result}"
+}
+mkalias_with_prefix 'lang_switch'
+
+lang_switch()
+{
+    str="$1"
+    [ "$str" = "" ] && read -p "Введите строчку:" str
+    lang1=$(cat <<EOF
+\`qwertyuiop[]asdfghjkl;\'zxcvbnm,./~QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM<>?
+EOF
+    )
+    lang2="ёйцукенгшщзхъфывапролдж\эячсмитьбю.ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖ\ЭЯЧСМИТЬБЮ,"
+    res1=$(lang_switch_custom "${str}" "${lang1}" "${lang2}")
+    res2=$(lang_switch_custom "${str}" "${lang2}" "${lang1}")
+    [ "$res1" != "$str" ] && echo "$res1"
+    [ "$res2" != "$str" ] && echo "$res2"
+    #echo "$lang1" "${#lang1}"
+    #echo "$lang2" "${#lang2}"
+}
+mkalias_with_prefix 'lang_switch'
+
+

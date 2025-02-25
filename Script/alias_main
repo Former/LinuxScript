@@ -27,6 +27,7 @@ source "${alias_dir}/a_video"
 source "${alias_dir}/a_image"
 source "${alias_dir}/a_ssh"
 source "${alias_dir}/a_download"
+source "${alias_dir}/a_lang"
 
 
 
