@@ -22,6 +22,4 @@ mkalias_with_prefix 'video_union_video_and_audio'
 
 
 cur_dir=${alias_dir}
-alias parse_arg_lib='${cur_dir}/../video_tools/parse_arg_lib'
-alias ${prefix}video_img_and_wav2video='${cur_dir}/../video_tools/img_and_wav2video'
-#alias ${prefix}video_union_video_and_audio='${cur_dir}/../video_tools/union_video_and_audio.bash'
+
