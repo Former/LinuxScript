@@ -42,11 +42,9 @@ install_alt_linux_progs()
      retext pdfmod \
      gedit gedit-plugins gedit-plugin-devhelp gedit-plugins-latex \
      cinnamon-full idesk icewm pcmanfm volumeicon mc \
-     nemo nemo-image-converter nemo-sendto-clamtk
-     nemo-arronax nemo-preview nemo-share \
-     nemo-beesu-manager nemo-preview-gir-devel nemo-share-common \
-     nemo-extensions-translations nemo-python nemo-terminal \
-     nemo-fileroller nemo-python-devel nemo-translations \
+     nemo nemo-arronax nemo-extensions-translations nemo-fileroller \
+     nemo-image-converter nemo-preview nemo-preview-gir-devel nemo-python nemo-python-devel \
+     nemo-sendto-clamtk nemo-share nemo-share-common nemo-terminal nemo-translations \
      photorec\
      mp3info\
      frescobaldi lilypond \
@@ -268,16 +266,25 @@ install_wifi_for_Android_13_in_altlinux()
 }
 mkalias_with_prefix 'install_wifi_for_Android_13_in_altlinux'
 
-install_set_macperf_andcharge_80()
+install_set_max_perf_and_charge_80()
 {
     printf "Максимальная производительность и заряд в 80%\n"
     ask_continue && return
     # Установить максимальный уровень заряда и поизводительности
     #sudo apt-get install tlp
-    sudo echo "80" > /sys/class/power_supply/BAT0/charge_control_end_threshold
-    sudo echo "80" > /sys/devices/system/cpu/intel_pstate/max_perf_pct
+    echo "80" | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
+    echo "80" | sudo tee /sys/devices/system/cpu/intel_pstate/max_perf_pct
 }
-mkalias_with_prefix 'install_set_macperf_andcharge_80'
+mkalias_with_prefix 'install_set_max_perf_and_charge_80'
+
+install_get_max_perf_and_charge()
+{
+    printf "Максимальная производительность и заряд:\n"
+    cat /sys/class/power_supply/BAT0/charge_control_end_threshold
+    cat /sys/devices/system/cpu/intel_pstate/max_perf_pct
+}
+mkalias_with_prefix 'install_get_max_perf_and_charge'
+
 
 install_headers()
 {
