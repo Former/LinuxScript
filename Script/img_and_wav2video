@@ -1,0 +1,126 @@
+#!/bin/bash
+# Общественное достояние, 2024, Алексей Безбородов (Alexei Bezborodov) <AlexeiBv+linux_script@narod.ru> 
+
+img_and_wav2video()
+{
+    # Объединение картинки и звука в видео
+
+    version=1.0
+
+    # Формат:
+    # "Однобуквенная команда|Расширенная команда|Справка|Параметр|Значение по умолчанию|Команда на исполнение"
+    # Параметр: Пусто - нет параметров, : - есть параметр, :: - параметр не обязателен
+
+    common_params=(
+        "h|help|Посмотреть помощь.|||ShowHelp; return 1;"
+        "v|version|Посмотреть версию программы.|||echo \$version; return 1;"
+        "V|verbose|Подробный вывод.|||verbose=true"
+        )
+
+    sound_params=(
+        "a|audio|Входной файл с аудиодорожкой.|:||"
+        "b|audio_options||:|'-c:a aac -b:a 128k'|"
+        )
+
+    video_params=(
+        "i|image|Входной файл с изображением.|:||"
+        "o|output|Выходной видео файл.|:|''|"
+        "W|video_width|Размер видео в пикселях по ширине. По умолчанию '!DEFAULT!'.|:|1920|"
+        "H|video_height|Размер видео в пикселях по высоте. По умолчанию '!DEFAULT!'.|:|1080|"
+        "p|ffmpeg_pre_options|Опции ffmpeg в самом начале. По умолчанию '!DEFAULT!'.|:|'-loop 1 -r 1'|"
+        "P|ffmpeg_options|Опции ffmpeg. По умолчанию '!DEFAULT!'.|:|'-c:v libx264 -tune stillimage -preset ultrafast -crf 20 -shortest -pix_fmt yuv420p'|"
+        )
+
+    all_params=("${common_params[@]}" "${sound_params[@]}" "${video_params[@]}")
+
+    function ShowHelp() {
+        return "
+Использование: img_and_wav2video -i <image> -a <wav> [-o <mp4_file>] [-hV]
+Объединение картинки и звука в видео
+
+Общие параметры
+$(ProcessParams common_params Params2Help)
+
+Параметры звука
+$(ProcessParams sound_params Params2Help)
+
+Параметры видео
+$(ProcessParams video_params Params2Help)
+
+Примеры:
+
+img_and_wav2video -i image.jpg -a audio.wav -o out.mp4
+# Расширенный вывод
+img_and_wav2video -i image.jpg -a audio.wav -o out.mp4 -V
+"
+    }
+
+    mainloop=$(MakeMainLoop "all_params")
+    echo "$mainloop"
+    eval "$mainloop"
+
+    # -------------------------------------------
+
+    # Главный цикл обработки входных параметров
+    eval "$main_loop"
+
+    image_file="$image"
+    audio_file="$audio"
+    out_file="$output"
+
+    unuse_param="$*"
+    if [ "${image_file}" = "" ] || [ "${audio_file}" = "" ] || [ "${unuse_param}" != "" ]; then
+        [ "${unuse_param}" != "" ] && echo "Параметры не расшифрованы \"$unuse_param\"" 
+        ShowHelp
+        return 1
+    fi
+
+    [ "$out_file" = "" ] && { out_file="${image_file}.mp4"; 
+    [ $verbose ] && echo "Выходное имя файла \"$out_file\""; }
+
+    MakeVideo "${image_file}" "${audio_file}" "${out_file}"
+}
+mkalias_with_prefix 'img_and_wav2video'
+
+#----------------------------------------------------
+
+function PlayTime {
+    local audio_file=$1
+
+    out=$(soxi -D "${audio_file}")
+    int=$(echo "$out/1" | bc)
+    echo "$int"
+}
+
+function MakeVideo {
+    local image_file=$1
+    local audio_file=$2
+    local mp4_file=$3
+
+    local resized_image_file=$(mktemp -t "MakeVideo_resized_page_image_XXXXXXXXXXX.png"
+)
+
+    local cmd="ffmpeg -y -i \"${image_file}\" -filter_complex \"[0]scale=${video_width}:${video_height}:force_original_aspect_ratio=decrease,pad=${video_width}:${video_height}:(ow-iw)/2:(oh-ih)/2[scale];[scale]split=2[bg][fg];[bg]drawbox=c=white@1:replace=1:t=fill[bg];[bg][fg]overlay=format=auto\" \"${resized_image_file}\""
+    [ $verbose ] && echo "cmd $cmd"
+    eval "$cmd"
+    [ $verbose ] && echo "ffmpeg $?"
+
+    local play_time=$(PlayTime "${audio_file}")
+    [ $verbose ] && echo "play_time ${play_time}"
+    play_time_plus1=$(( $play_time + 1 ))
+
+    water_mark=''
+    float_image=''
+#    video_filter="-filter_complex \"${water_mark}\" -map \"1:a\""
+    video_filter="-map 0 -map \"1:a\""
+
+    cmd="ffmpeg -y ${ffmpeg_pre_options} -i \"${resized_image_file}\" ${float_image} -i \"${audio_file}\" ${video_filter} ${ffmpeg_options} ${audio_options} -t \"${play_time}\" \"${mp4_file}\""
+    [ $verbose ] && echo "cmd $cmd"
+    eval "$cmd"
+    [ $verbose ] && echo "ffmpeg $?"
+
+    rm "${resized_image_file}"
+}
+
+
+

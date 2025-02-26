@@ -72,7 +72,7 @@ function Params2Case {
     eval "$param_var"
 
     if [ "$custom_arg1" = "-${small_cmd}" ] || [ "$custom_arg1" = "-${large_cmd}" ] || [ "$custom_arg1" = "--${large_cmd}" ]; then
-        clear_custom_cmd="${custom_cmd//[$'\t\r\n ']/}" 
+        clear_custom_cmd="${custom_cmd//[$\'\t\r\n \']/}" 
         if [ "${clear_custom_cmd}" != "" ]; then
             eval "${custom_cmd}"
         else
@@ -81,30 +81,35 @@ function Params2Case {
     fi
 }
 
-# Инициализация переменных
-ProcessParams all_params Params2InitVar
+function MakeMainLoop {
+    all_params_var_name=$1
+    mainloop='
+    # Инициализация переменных
+    ProcessParams all_params_array Params2InitVar
 
-# $@ is all command line parameters passed to the script.
-# -o is for short options like -v
-# -l is for long options with double dash like --version
-# the comma separates different long options
-# -a is for long options with single dash like -version
-# Example
-# 'h' is a no-value option.
-# 'v:' implies that option -v has value and is a mandatory option. ':' means has a value.
-# 't::' implies that option -t has value but is optional. '::' means optional.
-small_params_list=$(ProcessParams all_params Params2small_list)
-small_params_list="${small_params_list:1}"
+    # $@ is all command line parameters passed to the script.
+    # -o is for short options like -v
+    # -l is for long options with double dash like --version
+    # the comma separates different long options
+    # -a is for long options with single dash like -version
+    # Example
+    # "h" is a no-value option.
+    # "v:" implies that option -v has value and is a mandatory option. ":" means has a value.
+    # "t::" implies that option -t has value but is optional. "::" means optional.
+    small_params_list=$(ProcessParams all_params_array Params2small_list)
+    small_params_list="${small_params_list:1}"
 
-large_params_list=$(ProcessParams all_params Params2large_list)
-large_params_list="${large_params_list:1}"
+    large_params_list=$(ProcessParams all_params_array Params2large_list)
+    large_params_list="${large_params_list:1}"
 
-options=$(getopt --long "$large_params_list" -o "$small_params_list" -a -- "$@")
+    options=$(getopt --long "$large_params_list" -o "$small_params_list" -a -- "$@")
 
-# set --:
-# If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters 
-# are set to the arguments, even if some of them begin with a ‘-’.
-eval set -- "$options"
+    # set --:
+    # If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters 
+    # are set to the arguments, even if some of them begin with a ‘-’.
+    eval set -- "$options"
 
-main_loop='while true; do cur_arg="$1"; [ "$cur_arg" = "--" ] && { shift; break; }; ProcessParams all_params Params2Case "$cur_arg" "$2"; shift; done'
-
+    while true; do cur_arg="$1"; [ "$cur_arg" = "--" ] && { shift; break; }; ProcessParams all_params_array Params2Case "$cur_arg" "$2"; shift; done
+    '
+    retun "${mainloop//all_params_array/$all_params_var_name}"
+}

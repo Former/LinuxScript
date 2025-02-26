@@ -18,16 +18,18 @@ ask_continue()
 }
 
 
-source "${alias_dir}/a_install"
-source "${alias_dir}/a_pdf"
-source "${alias_dir}/a_hdd"
-source "${alias_dir}/a_openwrt"
-source "${alias_dir}/a_utils"
-source "${alias_dir}/a_video"
-source "${alias_dir}/a_image"
-source "${alias_dir}/a_ssh"
-source "${alias_dir}/a_download"
-source "${alias_dir}/a_lang"
+source "${alias_dir}/install"
+source "${alias_dir}/pdf"
+source "${alias_dir}/hdd"
+source "${alias_dir}/openwrt"
+source "${alias_dir}/utils"
+source "${alias_dir}/video"
+source "${alias_dir}/image"
+source "${alias_dir}/ssh"
+source "${alias_dir}/download"
+source "${alias_dir}/lang"
+source "${alias_dir}/parse_arg_lib"
+source "${alias_dir}/img_and_wav2video"
 
 
 
