@@ -57,7 +57,7 @@ img_and_wav2video -i image.jpg -a audio.wav -o out.mp4 -V
 
     mainloop=$(MakeMainLoop "all_params")
     echo "$mainloop"
-    eval "$mainloop"
+    #eval "$mainloop"
 
     # -------------------------------------------
 

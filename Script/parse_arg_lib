@@ -111,5 +111,5 @@ function MakeMainLoop {
 
     while true; do cur_arg="$1"; [ "$cur_arg" = "--" ] && { shift; break; }; ProcessParams all_params_array Params2Case "$cur_arg" "$2"; shift; done
     '
-    retun "${mainloop//all_params_array/$all_params_var_name}"
+    return "${mainloop//all_params_array/$all_params_var_name}"
 }

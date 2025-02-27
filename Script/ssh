@@ -15,3 +15,18 @@ ssh_for_openwpt_10.3_kamikadze()
 
 }
 mkalias_with_prefix 'ssh_for_openwpt_10.3_kamikadze'
+
+ssh_remote_port_forward()
+{
+    in_host_pattern=$1
+    [ "${in_host_pattern}" = "" ] && printf "Укажите имя сервера, порт и новый порт\n"
+    remote_port=$2
+    new_port=$3
+    [ "${remote_port}" = "" ] && remote_port="8384"
+    [ "${new_port}" = "" ] && new_port="8385"
+    # Пробрасываем удалённый порт 127.0.0.1:${remote_port} с сервера на текущий компьютер
+    ssh -L ${new_port}:127.0.0.1:${remote_port} ${in_host_pattern}
+    firefox 127.0.0.1:${new_port}
+}
+mkalias_with_prefix 'ssh_remote_port_forward'
+
