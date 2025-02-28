@@ -62,3 +62,17 @@ check_seconds()
     sec=$(date +%s) && if [[ "${sec: -2}" == "00" ]]; then echo "check"; fi; echo ${sec: -2}
 }
 mkalias_with_prefix 'check_seconds'
+
+cpu_frequency_set()
+{
+	freq=$1
+    [ "$freq" = '' ] && printf "Укажите частоту, например 1.5g\n" && return
+    sudo cpupower frequency-set --max ${freq}
+}
+mkalias_with_prefix 'cpu_frequency_set'
+
+cpu_frequency_get()
+{
+    cpupower frequency-info
+}
+mkalias_with_prefix 'cpu_frequency_get'
