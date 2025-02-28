@@ -47,7 +47,7 @@ mkalias_with_prefix 'check_internet_script'
 
 sensors_one_line()
 {
-    sens=$(sensors | grep -E 'power1|temp1' | grep -o -E ":\s*([\+0-9\.°C]+)") && sens=${sens// /} && echo ${sens:1}
+    sens=$(sensors | grep -E 'power1|temp1|Core 0|fan|Package' | grep -o -E ":\s*([\+0-9\.°]+)" | sed 's/\([0-9]*\)[\.][0-9]*/\1/g') && sens=${sens// /} && sens=${sens//:/} && echo ${sens}
 }
 mkalias_with_prefix 'sensors_one_line'
 
@@ -57,4 +57,8 @@ reload_bashrc()
 }
 mkalias_with_prefix 'reload_bashrc'
 
-
+check_seconds()
+{
+    sec=$(date +%s) && if [[ "${sec: -2}" == "00" ]]; then echo "check"; fi; echo ${sec: -2}
+}
+mkalias_with_prefix 'check_seconds'
