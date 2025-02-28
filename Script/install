@@ -266,24 +266,28 @@ install_wifi_for_Android_13_in_altlinux()
 }
 mkalias_with_prefix 'install_wifi_for_Android_13_in_altlinux'
 
-install_set_max_perf_and_charge_80()
+set_max_perf_and_charge()
 {
-    printf "Максимальная производительность и заряд в 80%\n"
+    max_perf=$1
+    max_charge=$2
+    [ "${max_perf}" = "" ]  && max_perf="80" 
+    [ "${max_charge}" = "" ]  && max_charge="80" 
+    printf "Максимальная производительность в ${max_perf} и заряд в ${max_charge}\n"
     ask_continue && return
     # Установить максимальный уровень заряда и поизводительности
     #sudo apt-get install tlp
-    echo "80" | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
-    echo "80" | sudo tee /sys/devices/system/cpu/intel_pstate/max_perf_pct
+    echo "${max_perf}" | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
+    echo "${max_charge}" | sudo tee /sys/devices/system/cpu/intel_pstate/max_perf_pct
 }
-mkalias_with_prefix 'install_set_max_perf_and_charge_80'
+mkalias_with_prefix 'set_max_perf_and_charge'
 
-install_get_max_perf_and_charge()
+get_max_perf_and_charge()
 {
     printf "Максимальная производительность и заряд:\n"
     cat /sys/class/power_supply/BAT0/charge_control_end_threshold
     cat /sys/devices/system/cpu/intel_pstate/max_perf_pct
 }
-mkalias_with_prefix 'install_get_max_perf_and_charge'
+mkalias_with_prefix 'get_max_perf_and_charge'
 
 
 install_headers()
