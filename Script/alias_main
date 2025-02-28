@@ -30,6 +30,7 @@ source "${alias_dir}/download"
 source "${alias_dir}/lang"
 source "${alias_dir}/parse_arg_lib"
 source "${alias_dir}/img_and_wav2video"
+source "${alias_dir}/nmap"
 
 
 

@@ -45,4 +45,16 @@ check_internet_script()
 }
 mkalias_with_prefix 'check_internet_script'
 
+sensors_one_line()
+{
+    sens=$(sensors | grep -E 'power1|temp1' | grep -o -E ":\s*([\+0-9\.°C]+)") && sens=${sens// /} && echo ${sens:1}
+}
+mkalias_with_prefix 'sensors_one_line'
+
+reload_bashrc()
+{
+    source ~/.bashrc
+}
+mkalias_with_prefix 'reload_bashrc'
+
 

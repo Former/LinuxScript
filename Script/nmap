@@ -1,0 +1,12 @@
+#!/bin/bash
+
+nmap_scan_hosts()
+{
+    in_host_pattern=$1
+    in_mask=$2
+    [ "${in_mask}" = "" ] && in_mask=24
+    [ "${in_host_pattern}" = "" ] && printf "Укажите шаблон адреса без последнего параметра, например '192.168.1'\n" && return
+    ips=$(nmap -sn ${in_host_pattern}.1/24 | grep 'Nmap scan' | grep -o -E "${in_host_pattern}.[0-9\.]+" | cut -b 8-) && echo ${ips}
+}
+mkalias_with_prefix 'nmap_scan_hosts'
+
