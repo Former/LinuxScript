@@ -79,3 +79,10 @@ cpu_frequency_get()
     cpupower frequency-info
 }
 mkalias_with_prefix 'cpu_frequency_get'
+
+git_pull_alias()
+{
+    cd ${alias_dir}
+    git pull
+}
+mkalias_with_prefix 'git_pull_alias'
