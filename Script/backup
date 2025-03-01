@@ -63,7 +63,7 @@ mkalias_with_prefix 'backup_delete_old_files_by_date'
 
 backup_date()
 {
-    return $(date +%Yy_%mm_%dd-%Vv-%Hh_%Mm_%Ss)
+    echo "$(date +%Yy_%mm_%dd-%Vv-%Hh_%Mm_%Ss)"
 }
 mkalias_with_prefix 'backup_date'
 
@@ -114,6 +114,8 @@ backup_home()
         --exclude=.apt \
         --exclude=.npm \
         --exclude=.gradle \
+        --exclude=Android \
+        --exclude=build/intermediates \
         .
     echo "${file}"
 }
