@@ -1,5 +1,8 @@
 #!/bin/bash
 
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
 pdf_a5()
 {
     [ $1 == '' ] && printf "Преобразование pdf к формату А5\nОшибка! Укажите входной файл\n" && return

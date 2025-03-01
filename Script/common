@@ -1,0 +1,18 @@
+#!/bin/bash
+
+prefix='a_'
+
+mkalias_with_prefix()
+{
+    alias ${prefix}$1="$1"
+}
+
+ask_continue()
+{
+    read -p "Продолжить [Y/n]?:" answ 
+    if [[ "${answ}" == "n" || "${answ}" == "N" ]]; then 
+        echo "Отменено" 
+        return 0
+    fi
+    return 1
+}

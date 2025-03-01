@@ -1,5 +1,8 @@
 #!/bin/bash
 
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
 vd='~/.local/bin/yt-dlp'
 alias ${prefix}download_yt_dlp="${vd}"
 

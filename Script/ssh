@@ -1,5 +1,8 @@
 #!/bin/bash
 
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
 ssh_del_known_host()
 {
     in_host_pattern=$1

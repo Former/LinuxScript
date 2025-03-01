@@ -1,5 +1,8 @@
 #!/bin/bash
 
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
 nmap_scan_hosts()
 {
     in_host_pattern=$1

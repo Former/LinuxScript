@@ -1,5 +1,8 @@
 #!/bin/bash
 
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
 lang_switch_custom()
 {
     str="$1"

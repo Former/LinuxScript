@@ -1,6 +1,9 @@
 #!/bin/bash
 # Общественное достояние, 2024, Алексей Безбородов (Alexei Bezborodov) <AlexeiBv+linux_script@narod.ru> 
 
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
 img_and_wav2video()
 {
     # Объединение картинки и звука в видео

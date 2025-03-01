@@ -1,5 +1,8 @@
 #!/bin/bash
 
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
 video_encode_240()
 {
     [ $1 == '' ] && printf "Перекодирование видео в формат 240*180\nУкажите входной шаблон. Например '*.mp4'\n" && return

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
 
 hdd_fill_zero()
 {

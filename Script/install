@@ -1,5 +1,8 @@
 #!/bin/bash
 
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
 install_alt_linux_enable_sshd()
 {
     printf "Запуск sshd\n"

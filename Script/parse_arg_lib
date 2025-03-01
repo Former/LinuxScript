@@ -1,6 +1,9 @@
 #!/bin/bash
 # Общественное достояние, 2024, Алексей Безбородов (Alexei Bezborodov) <AlexeiBv+mirocod_parse_arg_lib@narod.ru> 
 
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
 # Обработка входных параметров
 
 # Формат:
