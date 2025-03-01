@@ -86,3 +86,24 @@ git_pull_alias()
     git pull
 }
 mkalias_with_prefix 'git_pull_alias'
+
+git_push_alias()
+{
+    cd ${alias_dir}
+    git push
+}
+mkalias_with_prefix 'git_push_alias'
+
+git_commit_alias()
+{
+    cd ${alias_dir}
+    git commit
+}
+mkalias_with_prefix 'git_commit_alias'
+
+gitg_alias()
+{
+    cd ${alias_dir}
+    gitg
+}
+mkalias_with_prefix 'gitg_alias'

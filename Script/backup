@@ -116,6 +116,7 @@ backup_home()
         --exclude=.gradle \
         --exclude=Android \
         --exclude=build/intermediates \
+        --exclude=build/*.obj \
         .
     echo "${file}"
 }
