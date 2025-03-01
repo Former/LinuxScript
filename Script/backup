@@ -1,0 +1,131 @@
+#!/bin/bash
+
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
+backup_restore()
+{
+    in_file=$1
+    in_dir=$1
+    [ "$in_file" = '' || "$in_dir" = '' ] && printf "Укажите файл для распаковки и директурию, куда распаковывать, например 'backup_restore backup.tgz /home'\n" && return
+    printf "Произойдёт распаковка файла '$in_file' в папку '$in_dir'\n"
+    ask_continue && return
+    sudo tar xvpzf "$in_file" -C "$in_dir"
+}
+mkalias_with_prefix 'backup_restore'
+
+backup_delete_old_files_by_regex()
+{
+    backup_dir=$1
+    file_regex=$2
+    file_max_count=$3
+    filter=$4
+
+    file_max_count=$((file_max_count+1)) # tail не так работает
+    find "${backup_dir}" -regextype posix-extended -regex ".*${file_regex}" | grep -Ev "${filter}" | sort -r | tail -n +${file_max_count} | xargs -d '\n' rm -f
+}
+mkalias_with_prefix 'backup_delete_old_files_by_regex'
+
+# | grep -Ev "01d"
+#    cur_date=$(date +%Yy_%mm_%dd)
+# '.*([^1])-zakonvremeni_backup.tar'
+# '.*1-zakonvremeni_backup.tar'
+
+backup_delete_old_files_by_date()
+{
+    backup_dir=$1
+    file_name_template=$2
+    [[ "$backup_dir" == '' || "$file_name_template" == '' ]] && printf "Укажите имя папки и шаблон имени, например 'delete_old_backup_files_by_date backup/ host_name_@DATE.zip 3 4 5'. '@DATE' - означает дату в формате 'date +%%Yy_%%mm_%%dd', 3 - максимальное количество файлов сохраняемых ежедневно, 4 - ежемесячно, 5 - ежегодно\n" && return
+    file_max_count_every_day=$3
+    file_max_count_every_month=$4
+    file_max_count_every_year=$5
+
+    [[ "$file_max_count_every_day" == '' ]] && file_max_count_every_day=2
+    [[ "$file_max_count_every_month" == '' ]] && file_max_count_every_month=2
+    [[ "$file_max_count_every_year" == '' ]] && file_max_count_every_year=2
+
+    backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*'}" "${file_max_count_every_day}" 'm_01d|y_03m_01d'
+    backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*m_01d'}" "${file_max_count_every_month}" 'y_03m_01d'
+    backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*y_03m_01d'}" "${file_max_count_every_year}" '________NOTHONG___________'
+
+    # test
+    # for (( y = 2001; y < 2010; y++ )) do for (( m = 1; m < 10; m++ )) do for (( d = 1; d < 10; d++ )) do touch "backup_${y}y_0${m}m_0${d}d.zip"; backup_delete_old_files_by_date ./ "backup_@DATE\.zip" 2 2 2; sleep 0.15; done; done; done;
+}
+mkalias_with_prefix 'backup_delete_old_files_by_date'
+
+backup_firefox()
+{
+    backup_dir=$1
+    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    #ask_continue && return
+    cd ~
+    file="${backup_dir}/$(hostname)_mozilla_backup_$(date +%Yy_%mm_%dd-%Hh_%Mm_%Ss).tgz"
+    tar cvpzf "${file}" \
+        --exclude=.mozilla/firefox/*.*/Cache \
+        .mozilla
+    #--exclude=.mozilla/firefox/*.*/storage 
+    echo "${file}"
+}
+mkalias_with_prefix 'backup_firefox'
+
+backup_home()
+{
+    backup_dir=$1
+    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    #ask_continue && return
+
+    cd /home
+    file="${backup_dir}/$(hostname)_home_backup_$(date +%Yy_%mm_%dd-%Hh_%Mm_%Ss).tgz"
+    sudo tar cvpzf "${file}" \
+        --exclude=*home_backup*.tgz \
+        --exclude=*/Загрузки/* \
+        --exclude=*/Backup/* \
+        --exclude=*/Музыка/* \
+        --exclude=MyProgs \
+        --exclude=media \
+        --exclude=private \
+        --exclude=.thumbnails \
+        --exclude=.mozilla/firefox/*.*/Cache \
+        --exclude=*/.cache/* \
+        --exclude=/.config/chromium/*/CacheStorage \
+        --exclude=*/.config/skypeforlinux/Cache \
+        --exclude=.local \
+        --exclude=.var/app/app.organicmaps.desktop/data \
+        --exclude=.steam \
+        --exclude=.smartgit/updates \
+        --exclude=.wine*/*/windows/ \
+        --exclude=.googleearth \
+        --exclude=*/.Genymobile \
+        --exclude=go/pkg \
+        --exclude=.apt \
+        --exclude=.npm \
+        --exclude=.gradle \
+        .
+    echo "${file}"
+}
+mkalias_with_prefix 'backup_home'
+
+backup_()
+{
+    in_dir=$1
+    [ "$in_dir" = '' ] && printf "\n" && return
+    ask_continue && return
+}
+#mkalias_with_prefix 'backup_'
+
+backup_()
+{
+    in_dir=$1
+    [ "$in_dir" = '' ] && printf "\n" && return
+    ask_continue && return
+}
+#mkalias_with_prefix 'backup_'
+
+backup_()
+{
+    in_dir=$1
+    [ "$in_dir" = '' ] && printf "\n" && return
+    ask_continue && return
+}
+#mkalias_with_prefix 'backup_'
+
