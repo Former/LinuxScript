@@ -334,3 +334,12 @@ install_linux_mint_python2_7()
     sudo dpkg -i python2.7-minimal_2.7.18-13ubuntu1.5_amd64.deb libpython2.7_2.7.18-13ubuntu1.5_amd64.deb libpython2.7-stdlib_2.7.18-13ubuntu1.5_amd64.deb libpython2.7-minimal_2.7.18-13ubuntu1.5_amd64.deb
 }
 mkalias_with_prefix 'install_linux_mint_python2_7'
+
+flatpak_remove_unused()
+{
+    printf "Удаление неиспользуемых пакетов flatpak\n"
+    ask_continue && return
+    flatpak remove --unused
+}
+mkalias_with_prefix 'flatpak_remove_unused'
+
