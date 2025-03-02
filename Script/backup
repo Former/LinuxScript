@@ -117,6 +117,9 @@ backup_home()
         --exclude=Android \
         --exclude=build/intermediates \
         --exclude=build/*.obj \
+        --exclude=chromium/*/WebStorage \
+        --exclude=.android \
+        --exclude=.VirtualBox/*.iso \
         .
     echo "${file}"
 }
