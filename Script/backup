@@ -167,4 +167,50 @@ backup_sys()
 }
 mkalias_with_prefix 'backup_sys'
 
+backup_firefox_and_del_old_files()
+{
+    backup_dir=$1
+    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    #ask_continue && return
 
+    backup_host_dir="${backup_dir}/$(hostname)"
+    mkdir "${backup_host_dir}"
+    backup_ff_dir="${backup_host_dir}/firefox"
+    mkdir "${backup_ff_dir}"
+
+    backup_firefox "${backup_ff_dir}"
+    backup_delete_old_files_by_date "${backup_ff_dir}" "_mozilla_backup_@DATE\.tgz" 2 2 2 week
+}
+mkalias_with_prefix 'backup_firefox_and_del_old_files'
+
+backup_home_and_del_old_files()
+{
+    backup_dir=$1
+    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    #ask_continue && return
+
+    backup_host_dir="$(pwd)/$(hostname)"
+    mkdir "${backup_host_dir}"
+    backup_home_dir="${backup_host_dir}/home"
+    mkdir "${backup_home_dir}"
+
+    backup_home "${backup_home_dir}"
+    backup_delete_old_files_by_date "${backup_home_dir}" "_home_backup_@DATE\.tgz" 2 1 1 week
+}
+mkalias_with_prefix 'backup_home_and_del_old_files'
+
+backup_sys_and_del_old_files()
+{
+    backup_dir=$1
+    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    #ask_continue && return
+
+    backup_host_dir="$(pwd)/$(hostname)"
+    mkdir "${backup_host_dir}"
+    backup_sys_dir="${backup_host_dir}/sys"
+    mkdir "${backup_sys_dir}"
+
+    backup_etc "${backup_sys_dir}"
+    backup_delete_old_files_by_date "${backup_sys_dir}" "_sys_etc_backup_@DATE\.tgz" 3 3 3
+}
+mkalias_with_prefix 'backup_sys_and_del_old_files'

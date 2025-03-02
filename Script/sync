@@ -48,3 +48,17 @@ sync_by_filter()
     done
 }
 mkalias_with_prefix 'sync_by_filter'
+
+syncthing_local_config()
+{
+    port=$1
+    config_dir=$2
+    [ "$port" = "" ] && port=8396
+    [ "$config_dir" = "" ] && config_dir="$(pwd)/syncthing_home" && mkdir "$config_dir"
+    [[ "$port" != "$1" || "$config_dir" != "$2" ]] && printf "Запуск syncthing в папке '${config_dir}' и на порту '${port}'\n" && ask_continue && return
+
+    firefox "127.0.0.1:$port"
+
+    syncthing --gui-address="http://0.0.0.0:$port" --home="${config_dir}" --no-restart --no-upgrade --paused 
+}
+mkalias_with_prefix 'syncthing_local_config'
