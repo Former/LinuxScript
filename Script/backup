@@ -67,10 +67,17 @@ backup_date_week()
 }
 mkalias_with_prefix 'backup_date_week'
 
+backup_date_year()
+{
+    echo "$(date +%Yy)"
+}
+mkalias_with_prefix 'backup_date_year'
+
 backup_date_day()
 {
     week=$(backup_date_week)
-    echo "$(date +%Yy_%mm_%dd)-${week}"
+    year=$(backup_date_year)
+    echo "${year}_$(date +%mm_%dd)-${week}"
 }
 mkalias_with_prefix 'backup_date_day'
 
@@ -92,13 +99,11 @@ backup_firefox()
 {
     eval $(mkvar 'backup_dir|$1||Укажите папку для бекапа')
     eval $(mkvar 'user|$2|$(whoami)')
+    eval $(mkvar 'file_add_name|$4|mozilla_backup')
+    eval $(mkvar 'file|$3|${backup_dir}/$(hostname)_${user}_${file_add_name}_$(backup_date).tgz')
     #ask_continue && return
 
-    file_add_name="mozilla_backup"
-    file_pref="${backup_dir}/$(hostname)_${user}_${file_add_name}_"
-    compgen -G "${file_pref}$(backup_date_day)*" && printf "Сегодня уже делался бэкап\n" && return
-
-    file="${file_pref}$(backup_date).tgz"
+    echo "$(backup_date): Делаем бэкап /.mozilla в файл '${file}'"
 
     tar cvpzf "${file}" \
         ${exclude_mozilla//'\n'/' '} \
@@ -141,37 +146,31 @@ exclude_home='
 backup_home()
 {
     eval $(mkvar 'backup_dir|$1||Укажите папку для бекапа')
+    eval $(mkvar 'file_add_name|$3|home_backup')
+    eval $(mkvar 'file|$2|${backup_dir}/$(hostname)_${file_add_name}_$(backup_date).tgz')
     #ask_continue && return
 
-    file_add_name="home_backup"
-    file_pref="${backup_dir}/$(hostname)_${file_add_name}_"
-    compgen -G "${file_pref}*$(backup_date_week)*" && printf "На этой неделе уже делался бэкап\n" && return
+    echo "$(backup_date): Делаем бэкап /home в файл '${file}'"
 
-    file="${file_pref}$(backup_date).tgz"
     sudo tar cvpzf "${file}" \
         --exclude=/*${file_add_name}*.tgz \
         ${exclude_mozilla//'\n'/' '} \
         ${exclude_home//'\n'/' '} \
         /home
-    echo "${file}"
 }
 mkalias_with_prefix 'backup_home'
 
 backup_etc()
 {
     eval $(mkvar 'backup_dir|$1||Укажите папку для бекапа')
+    eval $(mkvar 'file_add_name|$3|sys_etc_backup')
+    eval $(mkvar 'file|$2|${backup_dir}/$(hostname)_${file_add_name}_$(backup_date).tgz')
     #ask_continue && return
 
-    file_add_name="sys_etc_backup"
-    file_pref="${backup_dir}/$(hostname)_${file_add_name}_"
-    compgen -G "${file_pref}$(backup_date_day)*" && printf "Сегодня уже делался бэкап\n" && return
-
-    file="${file_pref}$(backup_date).tgz"
+    echo "$(backup_date): Делаем бэкап /etc в файл '${file}'"
 
     sudo tar cvpzf "${file}" \
         /etc 
-    echo "${file}"
-    echo "Проверка на '${file_pref}$(backup_date_day)*'"
 }
 mkalias_with_prefix 'backup_etc'
 
@@ -195,13 +194,11 @@ backup_sys()
         --exclude=/opt \
     '
     eval $(mkvar 'backup_dir|$1||Укажите папку для бекапа')
+    eval $(mkvar 'file_add_name|$3|sysbackup')
+    eval $(mkvar 'file|$2|${backup_dir}/$(hostname)_${file_add_name}_$(backup_date).tgz')
     #ask_continue && return
 
-    file_add_name="sysbackup"
-    file_pref="${backup_dir}/$(hostname)_${file_add_name}_"
-    compgen -G "${file_pref}*$(backup_date_week)*" && printf "На этой неделе уже делался бэкап\n" && return
-
-    file="${file_pref}$(backup_date).tgz"
+    echo "$(backup_date): Делаем бэкап / в файл '${file}'"
 
     sudo tar cvpzf "${file}" \
         --exclude=/*${file_add_name}*.tgz \
@@ -223,8 +220,14 @@ backup_firefox_and_del_old_files()
     backup_ff_dir="${backup_host_dir}/firefox_${user}"
     mkdir "${backup_ff_dir}"
 
-    backup_firefox "${backup_ff_dir}"
-    backup_delete_old_files_by_date "${backup_ff_dir}" "_mozilla_backup_@DATE\.tgz" 3 2 2 week
+    file_add_name="mozilla_backup"
+    file_pref="${backup_ff_dir}/$(hostname)_${user}_${file_add_name}_"
+    compgen -G "${file_pref}*$(backup_date_year)*$(backup_date_week)*" && printf "$(backup_date): На этой неделе уже делался бэкап\n" && return
+
+    file="${file_pref}$(backup_date).tgz"
+
+    backup_firefox "${backup_ff_dir}" "${user}" "${file}" "${file_add_name}"
+    backup_delete_old_files_by_date "${backup_ff_dir}" "${file_add_name}_@DATE\.tgz" 3 2 2 week
 }
 mkalias_with_prefix 'backup_firefox_and_del_old_files'
 
@@ -239,8 +242,14 @@ backup_home_and_del_old_files()
     backup_home_dir="${backup_host_dir}/home"
     mkdir "${backup_home_dir}"
 
-    backup_home "${backup_home_dir}"
-    backup_delete_old_files_by_date "${backup_home_dir}" "_home_backup_@DATE\.tgz" 2 1 1 week
+    file_add_name="home_backup"
+    file_pref="${backup_home_dir}/$(hostname)_${file_add_name}_"
+    compgen -G "${file_pref}*$(backup_date_year)*$(backup_date_week)*" && printf "$(backup_date): На этой неделе уже делался бэкап\n" && return
+
+    file="${file_pref}$(backup_date).tgz"
+
+    backup_home "${backup_home_dir}" "${file}" "${file_add_name}"
+    backup_delete_old_files_by_date "${backup_home_dir}" "${file_add_name}_@DATE\.tgz" 2 1 1 week
 }
 mkalias_with_prefix 'backup_home_and_del_old_files'
 
@@ -255,8 +264,14 @@ backup_sys_and_del_old_files()
     backup_sys_dir="${backup_host_dir}/sys"
     mkdir "${backup_sys_dir}"
 
-    backup_etc "${backup_sys_dir}"
-    backup_delete_old_files_by_date "${backup_sys_dir}" "_sys_etc_backup_@DATE\.tgz" 3 3 3
+    file_add_name="sys_etc_backup"
+    file_pref="${backup_sys_dir}/$(hostname)_${file_add_name}_"
+    compgen -G "${file_pref}$(backup_date_day)*" && printf "$(backup_date): Сегодня уже делался бэкап\n" && return
+
+    file="${file_pref}$(backup_date).tgz"
+
+    backup_etc "${backup_sys_dir}" "${file}" "${file_add_name}"
+    backup_delete_old_files_by_date "${backup_sys_dir}" "${file_add_name}_@DATE\.tgz" 3 3 3
 }
 mkalias_with_prefix 'backup_sys_and_del_old_files'
 
@@ -266,7 +281,7 @@ backup_crontab_firefox()
     eval $(mkvar 'user|$2|$(whoami)')
     sudo_=""
     [[ "$user" != "$(whoami)" ]] && sudo_="sudo"
-    cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_firefox_and_del_old_files '${backup_dir}' $user"
+    cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_firefox_and_del_old_files '${backup_dir}' $user >> '/home/$(whoami)/Backup/backup_firefox.log'"
     echo "Будет установлена команда '${cmd}' с правами ${sudo_}"
     ask_continue && return
     crontab_add "${cmd}" ${sudo_}
@@ -277,7 +292,7 @@ backup_crontab_home()
 {
     eval $(mkvar 'backup_dir|$1|$(pwd)')
     sudo_="sudo"
-    cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_home_and_del_old_files '${backup_dir}'"
+    cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_home_and_del_old_files '${backup_dir}' >> '/home/$(whoami)/Backup/backup_home.log'"
     echo "Будет установлена команда '${cmd}' с правами ${sudo_}"
     ask_continue && return
     crontab_add "${cmd}" ${sudo_}
@@ -288,7 +303,7 @@ backup_crontab_etc()
 {
     eval $(mkvar 'backup_dir|$1|$(pwd)')
     sudo_="sudo"
-    cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_sys_and_del_old_files '${backup_dir}'"
+    cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_sys_and_del_old_files '${backup_dir}' >> '/home/$(whoami)/Backup/backup_etc.log'"
     echo "Будет установлена команда '${cmd}' с правами ${sudo_}"
     ask_continue && return
     crontab_add "${cmd}" ${sudo_}
