@@ -16,3 +16,22 @@ ask_continue()
     fi
     return 1
 }
+
+mkvar()
+{
+    # на входе 'var_name|val|def_val|string_to_print_before_return'
+    p="$1"
+    readarray -d "|" -t cur_params <<< "$p"
+    var_name="${cur_params[0]}"
+    val="${cur_params[1]}"
+    def_val="${cur_params[2]}"
+    string_to_print_before_return="${cur_params[3]}"
+
+    if [ "${string_to_print_before_return}" == "" ]; then
+        echo "$var_name=$val; [[ \"\${$var_name}\" == \"\" ]] && $var_name=$def_val;"
+    else
+        echo "$var_name=$val; [[ \"\${$var_name}\" == \"\" ]] && printf(\"${string_to_print_before_return}\\n\") && return;"
+    fi
+}
+
+

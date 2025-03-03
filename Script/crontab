@@ -1,0 +1,79 @@
+#!/bin/bash
+
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
+crontab_edit()
+{
+    sudo_=$1
+    EDITOR=mcedit $sudo_ crontab -e
+}
+mkalias_with_prefix 'crontab_edit'
+
+crontab_edit_sudo()
+{
+    crontab_edit sudo
+}
+mkalias_with_prefix 'crontab_edit_sudo'
+
+crontab_print()
+{
+    sudo_=$1
+    $sudo_ crontab -l
+}
+mkalias_with_prefix 'crontab_print'
+
+crontab_add_silence()
+{
+    cmd=$1
+    sudo_=$2
+    $sudo_ crontab -l | { cat; echo "${cmd}"; } | $sudo_ crontab -
+}
+mkalias_with_prefix 'crontab_add_silence'
+
+crontab_add()
+{
+    cron_help='
+#minute (0-59),
+#|<---->hour (0-23),
+#|<---->|<----->day of the month (1-31),
+#|<---->|<----->|<----->mfreqonth of the year (1-12),
+#|<---->|<----->|<----->|<----->day of the week (0-6 with 0=Sunday).
+#|<---->|<----->|<----->|<----->|<----->commands
+
+Примеры Cron заданий
+
+Запускать команду в 15:00 каждый день с понедельника по пятницу:
+0 15 * * 1-5 command
+
+Запускать скрипт каждые 5 минут:
+
+MAILTO=email@example.com
+*/5 * * * * /path/to/script.sh > /dev/null
+
+Запускать сценарий в первый понедельник каждого месяца в 7 часов утра:
+
+0 7 1-7 * 1 /path/to/script.sh
+
+Запускать сценарий в 21:15, 1 и 15 числа каждого месяца:
+
+15 9 1,15 * * /path/to/script.sh
+
+Запускать при старте ситемы:
+
+@reboot /path/to/script.sh
+    '
+    cmd="$1"
+    sudo_=$2
+    [[ "$cmd" == "" ]] && printf "Укажите команду, например 'crontab_add \"00 09 * * 1-5 echo hello\"}' ${cron_help}\n" && return
+    printf "Добавляем команду '${cmd}'\n"
+    ask_continue && return
+
+    crontab_add_silence "$cmd" "$sudo_"
+
+    printf "Получившийся кронтаб:\n"
+    crontab_print "$sudo_"
+}
+mkalias_with_prefix 'crontab_add'
+
+

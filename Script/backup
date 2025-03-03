@@ -61,81 +61,106 @@ backup_delete_old_files_by_date()
 }
 mkalias_with_prefix 'backup_delete_old_files_by_date'
 
+backup_date_day()
+{
+    echo "$(date +%Yy_%mm_%dd-%Vv)"
+}
+mkalias_with_prefix 'backup_date_day'
+
 backup_date()
 {
-    echo "$(date +%Yy_%mm_%dd-%Vv-%Hh_%Mm_%Ss)"
+    day=$(backup_date_day)
+    echo "${day}-$(date +%Hh_%Mm_%Ss)"
 }
 mkalias_with_prefix 'backup_date'
 
+exclude_mozilla='
+--exclude=.mozilla/firefox/*/Cache 
+--exclude=.mozilla/firefox/*/storage/*/https* 
+--exclude=.mozilla/firefox/*/storage/*/http* 
+--exclude=.mozilla/firefox/*/storage/*/file*
+'
+
 backup_firefox()
 {
-    backup_dir=$1
-    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    eval $(mkvar 'backup_dir|$1||Укажите папку для бекапа')
+    eval $(mkvar 'user|$2|$(whoami)')
     #ask_continue && return
-    cd ~
-    file="${backup_dir}/$(hostname)_mozilla_backup_$(backup_date).tgz"
+
+    file_add_name="mozilla_backup"
+    file_pref="${backup_dir}/$(hostname)_${user}_${file_add_name}_"
+    [ -f "${file_pref}$(backup_date_day)*" ] && printf "Сегодня уже делался бэкап\n" && return
+
+    file="${file_pref}$(backup_date).tgz"
+
     tar cvpzf "${file}" \
-        --exclude=.mozilla/firefox/*/Cache \
-        --exclude=.mozilla/firefox/*/storage/*/https* \
-        --exclude=.mozilla/firefox/*/storage/*/file* \
-        .mozilla
+        ${exclude_mozilla//'\n'/' '} \
+        /home/${user}/.mozilla
 
     echo "${file}"
 }
 mkalias_with_prefix 'backup_firefox'
 
+exclude_home='
+--exclude=*/Загрузки/* \
+--exclude=*/Backup/* \
+--exclude=*/Музыка/* \
+--exclude=MyProgs \
+--exclude=media \
+--exclude=private \
+--exclude=.thumbnails \
+--exclude=*/.cache/* \
+--exclude=/.config/chromium/*/CacheStorage \
+--exclude=*/.config/skypeforlinux/Cache \
+--exclude=.local \
+--exclude=.var/app/app.organicmaps.desktop/data \
+--exclude=.steam \
+--exclude=.smartgit/updates \
+--exclude=.wine*/*/windows/ \
+--exclude=.googleearth \
+--exclude=*/.Genymobile \
+--exclude=go/pkg \
+--exclude=.apt \
+--exclude=.npm \
+--exclude=.gradle \
+--exclude=Android \
+--exclude=build/intermediates \
+--exclude=build/*.obj \
+--exclude=chromium/*/WebStorage \
+--exclude=.android \
+--exclude=.VirtualBox/*.iso \
+'
+
 backup_home()
 {
-    backup_dir=$1
-    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    eval $(mkvar 'backup_dir|$1||Укажите папку для бекапа')
     #ask_continue && return
 
-    cd /home
-    file="${backup_dir}/$(hostname)_home_backup_$(backup_date).tgz"
+    file_add_name="home_backup"
+    file_pref="${backup_dir}/$(hostname)_${file_add_name}_"
+    [ -f "${file_pref}$(backup_date_day)*" ] && printf "Сегодня уже делался бэкап\n" && return
+
+    file="${file_pref}$(backup_date).tgz"
     sudo tar cvpzf "${file}" \
-        --exclude=*home_backup*.tgz \
-        --exclude=*/Загрузки/* \
-        --exclude=*/Backup/* \
-        --exclude=*/Музыка/* \
-        --exclude=MyProgs \
-        --exclude=media \
-        --exclude=private \
-        --exclude=.thumbnails \
-        --exclude=.mozilla/firefox/*/Cache \
-        --exclude=.mozilla/firefox/*/storage/*/https* \
-        --exclude=.mozilla/firefox/*/storage/*/file* \
-        --exclude=*/.cache/* \
-        --exclude=/.config/chromium/*/CacheStorage \
-        --exclude=*/.config/skypeforlinux/Cache \
-        --exclude=.local \
-        --exclude=.var/app/app.organicmaps.desktop/data \
-        --exclude=.steam \
-        --exclude=.smartgit/updates \
-        --exclude=.wine*/*/windows/ \
-        --exclude=.googleearth \
-        --exclude=*/.Genymobile \
-        --exclude=go/pkg \
-        --exclude=.apt \
-        --exclude=.npm \
-        --exclude=.gradle \
-        --exclude=Android \
-        --exclude=build/intermediates \
-        --exclude=build/*.obj \
-        --exclude=chromium/*/WebStorage \
-        --exclude=.android \
-        --exclude=.VirtualBox/*.iso \
-        .
+        --exclude=/*${file_add_name}*.tgz \
+        ${exclude_mozilla//'\n'/' '} \
+        ${exclude_home//'\n'/' '} \
+        /home
     echo "${file}"
 }
 mkalias_with_prefix 'backup_home'
 
 backup_etc()
 {
-    backup_dir=$1
-    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    eval $(mkvar 'backup_dir|$1||Укажите папку для бекапа')
     #ask_continue && return
-    cd /
-    file="${backup_dir}/$(hostname)_sys_etc_backup_$(backup_date).tgz"
+
+    file_add_name="sys_etc_backup"
+    file_pref="${backup_dir}/$(hostname)_${file_add_name}_"
+    [ -f "${file_pref}$(backup_date_day)*" ] && printf "Сегодня уже делался бэкап\n" && return
+
+    file="${file_pref}$(backup_date).tgz"
+
     sudo tar cvpzf "${file}" \
         /etc 
     echo "${file}"
@@ -144,13 +169,7 @@ mkalias_with_prefix 'backup_etc'
 
 backup_sys()
 {
-    backup_dir=$1
-    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
-    #ask_continue && return
-    cd /
-    file="${backup_dir}/$(hostname)_sysbackup_$(backup_date).tgz"
-    sudo tar cvpzf "${file}" \
-        --exclude=/*_sysbackup_*.tgz \
+    exclude_sys='
         --exclude=/proc \
         --exclude=/dev \
         --exclude=/lost+found \
@@ -166,6 +185,19 @@ backup_sys()
         --exclude=/usr/share \
         --exclude=/tmp \
         --exclude=/opt \
+    '
+    eval $(mkvar 'backup_dir|$1||Укажите папку для бекапа')
+    #ask_continue && return
+
+    file_add_name="sysbackup"
+    file_pref="${backup_dir}/$(hostname)_${file_add_name}_"
+    [ -f "${file_pref}$(backup_date_day)*" ] && printf "Сегодня уже делался бэкап\n" && return
+
+    file="${file_pref}$(backup_date).tgz"
+
+    sudo tar cvpzf "${file}" \
+        --exclude=/*${file_add_name}*.tgz \
+        ${exclude_sys//'\n'/' '} \
         /
     echo "${file}"
 }
@@ -174,12 +206,13 @@ mkalias_with_prefix 'backup_sys'
 backup_firefox_and_del_old_files()
 {
     backup_dir=$1
-    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    [ "$backup_dir" = '' ] && backup_dir=$(pwd) && printf "Папка для бекапа '${backup_dir}'\n"
+    eval $(mkvar 'user|$2|$(whoami)')
     #ask_continue && return
 
     backup_host_dir="${backup_dir}/$(hostname)"
     mkdir "${backup_host_dir}"
-    backup_ff_dir="${backup_host_dir}/firefox"
+    backup_ff_dir="${backup_host_dir}/firefox_${user}"
     mkdir "${backup_ff_dir}"
 
     backup_firefox "${backup_ff_dir}"
@@ -190,10 +223,10 @@ mkalias_with_prefix 'backup_firefox_and_del_old_files'
 backup_home_and_del_old_files()
 {
     backup_dir=$1
-    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    [ "$backup_dir" = '' ] && backup_dir=$(pwd) && printf "Папка для бекапа '${backup_dir}'\n"
     #ask_continue && return
 
-    backup_host_dir="$(pwd)/$(hostname)"
+    backup_host_dir="${backup_dir}/$(hostname)"
     mkdir "${backup_host_dir}"
     backup_home_dir="${backup_host_dir}/home"
     mkdir "${backup_home_dir}"
@@ -206,10 +239,10 @@ mkalias_with_prefix 'backup_home_and_del_old_files'
 backup_sys_and_del_old_files()
 {
     backup_dir=$1
-    [ "$backup_dir" = '' ] && printf "Укажите папку для бекапа\n" && return
+    [ "$backup_dir" = '' ] && backup_dir=$(pwd) && printf "Папка для бекапа '${backup_dir}'\n" 
     #ask_continue && return
 
-    backup_host_dir="$(pwd)/$(hostname)"
+    backup_host_dir="${backup_dir}/$(hostname)"
     mkdir "${backup_host_dir}"
     backup_sys_dir="${backup_host_dir}/sys"
     mkdir "${backup_sys_dir}"

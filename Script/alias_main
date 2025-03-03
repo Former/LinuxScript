@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source "${alias_dir}/crontab"
 source "${alias_dir}/install"
 source "${alias_dir}/pdf"
 source "${alias_dir}/hdd"
