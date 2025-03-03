@@ -61,9 +61,16 @@ backup_delete_old_files_by_date()
 }
 mkalias_with_prefix 'backup_delete_old_files_by_date'
 
+backup_date_week()
+{
+    echo "$(date +%Vv)"
+}
+mkalias_with_prefix 'backup_date_week'
+
 backup_date_day()
 {
-    echo "$(date +%Yy_%mm_%dd-%Vv)"
+    week=$(backup_date_week)
+    echo "$(date +%Yy_%mm_%dd)-${week}"
 }
 mkalias_with_prefix 'backup_date_day'
 
@@ -89,7 +96,7 @@ backup_firefox()
 
     file_add_name="mozilla_backup"
     file_pref="${backup_dir}/$(hostname)_${user}_${file_add_name}_"
-    [ -f "${file_pref}$(backup_date_day)*" ] && printf "Сегодня уже делался бэкап\n" && return
+    compgen -G "${file_pref}$(backup_date_day)*" && printf "Сегодня уже делался бэкап\n" && return
 
     file="${file_pref}$(backup_date).tgz"
 
@@ -138,7 +145,7 @@ backup_home()
 
     file_add_name="home_backup"
     file_pref="${backup_dir}/$(hostname)_${file_add_name}_"
-    [ -f "${file_pref}$(backup_date_day)*" ] && printf "Сегодня уже делался бэкап\n" && return
+    compgen -G "${file_pref}*$(backup_date_week)*" && printf "На этой неделе уже делался бэкап\n" && return
 
     file="${file_pref}$(backup_date).tgz"
     sudo tar cvpzf "${file}" \
@@ -157,13 +164,14 @@ backup_etc()
 
     file_add_name="sys_etc_backup"
     file_pref="${backup_dir}/$(hostname)_${file_add_name}_"
-    [ -f "${file_pref}$(backup_date_day)*" ] && printf "Сегодня уже делался бэкап\n" && return
+    compgen -G "${file_pref}$(backup_date_day)*" && printf "Сегодня уже делался бэкап\n" && return
 
     file="${file_pref}$(backup_date).tgz"
 
     sudo tar cvpzf "${file}" \
         /etc 
     echo "${file}"
+    echo "Проверка на '${file_pref}$(backup_date_day)*'"
 }
 mkalias_with_prefix 'backup_etc'
 
@@ -191,7 +199,7 @@ backup_sys()
 
     file_add_name="sysbackup"
     file_pref="${backup_dir}/$(hostname)_${file_add_name}_"
-    [ -f "${file_pref}$(backup_date_day)*" ] && printf "Сегодня уже делался бэкап\n" && return
+    compgen -G "${file_pref}*$(backup_date_week)*" && printf "На этой неделе уже делался бэкап\n" && return
 
     file="${file_pref}$(backup_date).tgz"
 
@@ -216,7 +224,7 @@ backup_firefox_and_del_old_files()
     mkdir "${backup_ff_dir}"
 
     backup_firefox "${backup_ff_dir}"
-    backup_delete_old_files_by_date "${backup_ff_dir}" "_mozilla_backup_@DATE\.tgz" 3 3 3 week
+    backup_delete_old_files_by_date "${backup_ff_dir}" "_mozilla_backup_@DATE\.tgz" 3 2 2 week
 }
 mkalias_with_prefix 'backup_firefox_and_del_old_files'
 
@@ -251,3 +259,40 @@ backup_sys_and_del_old_files()
     backup_delete_old_files_by_date "${backup_sys_dir}" "_sys_etc_backup_@DATE\.tgz" 3 3 3
 }
 mkalias_with_prefix 'backup_sys_and_del_old_files'
+
+backup_crontab_firefox()
+{
+    eval $(mkvar 'backup_dir|$1|$(pwd)')
+    eval $(mkvar 'user|$2|$(whoami)')
+    sudo_=""
+    [[ "$user" != "$(whoami)" ]] && sudo_="sudo"
+    cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_firefox_and_del_old_files '${backup_dir}' $user"
+    echo "Будет установлена команда '${cmd}' с правами ${sudo_}"
+    ask_continue && return
+    crontab_add "${cmd}" ${sudo_}
+}
+mkalias_with_prefix 'backup_crontab_firefox'
+
+backup_crontab_home()
+{
+    eval $(mkvar 'backup_dir|$1|$(pwd)')
+    eval $(mkvar 'user|$2|$(whoami)')
+    sudo_="sudo"
+    cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_home_and_del_old_files '${backup_dir}'"
+    echo "Будет установлена команда '${cmd}' с правами ${sudo_}"
+    ask_continue && return
+    crontab_add "${cmd}" ${sudo_}
+}
+mkalias_with_prefix 'backup_crontab_home'
+
+backup_crontab_etc()
+{
+    eval $(mkvar 'backup_dir|$1|$(pwd)')
+    eval $(mkvar 'user|$2|$(whoami)')
+    sudo_="sudo"
+    cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_sys_and_del_old_files '${backup_dir}'"
+    echo "Будет установлена команда '${cmd}' с правами ${sudo_}"
+    ask_continue && return
+    crontab_add "${cmd}" ${sudo_}
+}
+mkalias_with_prefix 'backup_crontab_home'

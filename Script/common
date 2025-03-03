@@ -30,7 +30,7 @@ mkvar()
     if [ "${string_to_print_before_return}" == "" ]; then
         echo "$var_name=$val; [[ \"\${$var_name}\" == \"\" ]] && $var_name=$def_val;"
     else
-        echo "$var_name=$val; [[ \"\${$var_name}\" == \"\" ]] && printf(\"${string_to_print_before_return}\\n\") && return;"
+        echo "$var_name=$val; [[ \"\${$var_name}\" == \"\" ]] && printf \"${string_to_print_before_return}\\n\" && return;"
     fi
 }
 
