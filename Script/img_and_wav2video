@@ -1,5 +1,8 @@
 #!/bin/bash
-# Общественное достояние, 2024, Алексей Безбородов (Alexei Bezborodov) <AlexeiBv+linux_script@narod.ru> 
+
+# Copyright 2025 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
+# License: Public domain: http://unlicense.org/ 
+# Общественное достояние 
 
 [ "${alias_dir}" = "" ] && alias_dir=$(pwd)
 source "${alias_dir}/common"

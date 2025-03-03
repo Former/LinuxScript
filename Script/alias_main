@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Copyright 2025 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
+# License: Public domain: http://unlicense.org/ 
+# Общественное достояние 
+
 source "${alias_dir}/crontab"
 source "${alias_dir}/install"
 source "${alias_dir}/pdf"
