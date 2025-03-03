@@ -276,7 +276,6 @@ mkalias_with_prefix 'backup_crontab_firefox'
 backup_crontab_home()
 {
     eval $(mkvar 'backup_dir|$1|$(pwd)')
-    eval $(mkvar 'user|$2|$(whoami)')
     sudo_="sudo"
     cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_home_and_del_old_files '${backup_dir}'"
     echo "Будет установлена команда '${cmd}' с правами ${sudo_}"
@@ -288,11 +287,10 @@ mkalias_with_prefix 'backup_crontab_home'
 backup_crontab_etc()
 {
     eval $(mkvar 'backup_dir|$1|$(pwd)')
-    eval $(mkvar 'user|$2|$(whoami)')
     sudo_="sudo"
     cmd="0 * * * * source /home/$(whoami)/.bashrc && backup_sys_and_del_old_files '${backup_dir}'"
     echo "Будет установлена команда '${cmd}' с правами ${sudo_}"
     ask_continue && return
     crontab_add "${cmd}" ${sudo_}
 }
-mkalias_with_prefix 'backup_crontab_home'
+mkalias_with_prefix 'backup_crontab_etc'
