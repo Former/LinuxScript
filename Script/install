@@ -276,18 +276,18 @@ set_max_perf_and_charge()
     ask_continue && return
     # Установить максимальный уровень заряда и поизводительности
     #sudo apt-get install tlp
-    echo "${max_perf}" | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
-    echo "${max_charge}" | sudo tee /sys/devices/system/cpu/intel_pstate/max_perf_pct
-    crontab_add "@reboot echo "${max_perf}" | tee /sys/class/power_supply/BAT0/charge_control_end_threshold" sudo
-    crontab_add "@reboot echo "${max_charge}" | tee /sys/devices/system/cpu/intel_pstate/max_perf_pct" sudo
+    echo "${max_charge}" | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
+    echo "${max_perf}" | sudo tee /sys/devices/system/cpu/intel_pstate/max_perf_pct
+    crontab_add "@reboot echo "${max_charge}" | tee /sys/class/power_supply/BAT0/charge_control_end_threshold" sudo
+    crontab_add "@reboot echo "${max_perf}" | tee /sys/devices/system/cpu/intel_pstate/max_perf_pct" sudo
 }
 mkalias_with_prefix 'set_max_perf_and_charge'
 
 get_max_perf_and_charge()
 {
     printf "Максимальная производительность и заряд:\n"
-    cat /sys/class/power_supply/BAT0/charge_control_end_threshold
     cat /sys/devices/system/cpu/intel_pstate/max_perf_pct
+    cat /sys/class/power_supply/BAT0/charge_control_end_threshold
 }
 mkalias_with_prefix 'get_max_perf_and_charge'
 
