@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Copyright 2025 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
+# License: Public domain: http://unlicense.org/ 
+# Общественное достояние 
+
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
+rpm_get_packege_for_file()
+{
+    in_file_pattern=$1
+    [ "${in_file_pattern}" = "" ] && printf "Укажите файл\n" && return
+    rpm -qf "${in_file_pattern}"
+}
+mkalias_with_prefix 'rpm_get_packege_for_file'
+

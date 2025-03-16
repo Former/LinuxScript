@@ -112,7 +112,7 @@ openwrt_upload_by_tftp()
     file_name="${url##*/}"
 
     [ "$url" = "" ] && printf "Укажите url для скачивания, например 'http://downloads.openwrt.org/backfire/10.03/brcm47xx/openwrt-brcm47xx-squashfs.trx' или полный путь к файлу\n" && return
-    printf "Загрузка openwrt на роутер через tftp. Подойдёт например для asus_wl520gu или asus_wl500pgv2. Внимание! В текущую папру произойдёт загрузка файла ${file_name}\n"
+    printf "Загрузка openwrt на роутер через tftp. Подойдёт например для asus_wl520gu или asus_wl500pgv2. Внимание! В текущую папку произойдёт загрузка файла ${file_name}\n"
     ask_continue && return
 
     [ -f ./${file_name} ] || wget "${url}"

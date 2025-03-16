@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Copyright 2025 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
+# License: Public domain: http://unlicense.org/ 
+# Общественное достояние 
+
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
+systemctl_journal_clean()
+{
+    day_count=$1
+    [ "${day_count}" = "" ] && day_count=7 
+    printf "Будут удалены журналы старше ${day_count} дней\n"
+    ask_continue && return
+    sudo journalctl --vacuum-time=${day_count}d
+}
+mkalias_with_prefix 'systemctl_journal_clean'
+
