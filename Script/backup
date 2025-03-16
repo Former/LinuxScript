@@ -164,6 +164,23 @@ backup_home()
 }
 mkalias_with_prefix 'backup_home'
 
+backup_home_full()
+{
+    eval $(mkvar 'backup_dir|$1||Укажите папку для бекапа')
+    eval $(mkvar 'file_add_name|$3|home_backup')
+    eval $(mkvar 'file|$2|${backup_dir}/$(hostname)_${file_add_name}_$(backup_date).tgz')
+
+    echo "$(backup_date): Делаем бэкап /home в файл '${file}'"
+    ask_continue && return
+
+    sudo tar cvpzf "${file}" \
+        --exclude=/*${file_add_name}*.tgz \
+        --exclude=*/media/* \
+        /home
+}
+mkalias_with_prefix 'backup_home_full'
+
+
 backup_etc()
 {
     eval $(mkvar 'backup_dir|$1||Укажите папку для бекапа')
