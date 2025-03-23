@@ -64,7 +64,10 @@ install_alt_linux_progs()
      NetworkManager-tui \
      flatpak\
      tlp\
-     syncthing
+     syncthing\
+     solvespace blender \
+     virtualbox \
+     qtox
 }
 mkalias_with_prefix 'install_alt_linux_progs'
 
