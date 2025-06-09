@@ -67,6 +67,7 @@ install_alt_linux_progs()
      syncthing\
      solvespace blender \
      virtualbox \
+     token-manager \
      qtox
 }
 mkalias_with_prefix 'install_alt_linux_progs'
@@ -266,7 +267,7 @@ mkalias_with_prefix 'install_fuse_config'
 
 install_wifi_for_Android_13_in_altlinux()
 {
-    [ "$1" == "" ] printf "Установка возможности пользоваться fusermount обычным пользователям для AltLinux\nУкажите имя соединения\n" && return
+    [ "$1" == "" ] && printf "Enable wi-fi for Android 13 in altlinux\n" && return
     WIFINAME=$1
     # Enable wi-fi for Android 13 in altlinux
     nmcli connection modify ${WIFINAME} wifi-sec.pmf 1

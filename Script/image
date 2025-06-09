@@ -19,20 +19,19 @@ mkalias_with_prefix 'img_all_to_djvu'
 
 img_resize()
 {
-    search_template=$1
-    [ "${search_template}" == "" ] && printf "Изменение размера и удаление exif\nУкажите входной шаблон файлов и ширину. Например: \"*.JPG\" 1536\nВыбран шаблон по умолчанию \"*.JPG\"\n" && search_template="*.JPG" && ask_continue && return
-
-    image_width=$2
-    echo "${image_width}"
-    [ "${image_width}" = "" ] && image_width="1536" && printf "Выбрана ширина '${image_width}'\n"
-
-    image_params=$3
+    eval $(mkvar 'search_template|$1|*.JPG|Изменение размера и удаление exif\nУкажите входной шаблон файлов и ширину. Например: \"*.JPG\" 1536\nВыбран шаблон по умолчанию \"*.JPG\"\n')
+    eval $(mkvar 'image_width|$2|1536')
+    eval $(mkvar 'image_params|$3|')
 
     resize_img_dir="resize_img"
+    echo "image_width = ${image_width}"
+    echo "search_template = ${search_template}"
+
     mkdir ${resize_img_dir}
     for entry in $search_template;
     do
-        echo "${entry}"
+        echo "entry= ${entry}"
+        echo "image_width = ${image_width}"
         convert "${entry}" -resize ${image_width} ${image_params} "${resize_img_dir}/${entry}"
     done
 }
@@ -40,7 +39,7 @@ mkalias_with_prefix 'img_resize'
 
 img_resize_and_del_exif()
 {
-    img_resize $1 $2 -strip
+    img_resize "$1" $2 -strip
 }
 mkalias_with_prefix 'img_resize_and_del_exif'
 
