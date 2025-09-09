@@ -35,7 +35,8 @@ install_alt_linux_progs()
      wol sshfs traceroute encfs openssh-server nmap\
      remmina xrdp qbittorrent \
      filezilla \
-     geany geany-plugins screen git gitg gitk git-cola  \
+     geany geany-plugins screen \
+     git gitg gitk git-cola lazygit \
      golang sqlite3 nodejs \
      build-environment ctest gcc-c++ gcc clang \
      flex libncurses-devel \
@@ -46,7 +47,7 @@ install_alt_linux_progs()
      minetest\
      texlive texstudio \
      systemd-settings-disable-kill-user-processes \
-     retext pdfmod \
+     retext pdfmod ripgrep \
      gedit gedit-plugins gedit-plugin-devhelp gedit-plugins-latex \
      cinnamon-full idesk icewm pcmanfm volumeicon mc \
      nemo nemo-arronax nemo-extensions-translations nemo-fileroller \
@@ -68,7 +69,7 @@ install_alt_linux_progs()
      solvespace blender \
      virtualbox \
      token-manager \
-     qtox
+     qtox 
 }
 mkalias_with_prefix 'install_alt_linux_progs'
 
