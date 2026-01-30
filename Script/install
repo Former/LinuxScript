@@ -221,6 +221,9 @@ install_thinkfan()
     sudo /usr/sbin/thinkfan -n
     # run: 
     systemctl enable --now thinkfan.service
+    
+    # https://github.com/erhankilic/my-thinkpad-x220-setup
+
     '
 }
 mkalias_with_prefix 'install_thinkfan'

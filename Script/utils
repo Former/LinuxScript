@@ -62,7 +62,7 @@ mkalias_with_prefix 'check_internet_script'
 
 sensors_one_line()
 {
-    sens=$(sensors | grep -E 'power1|temp1|Core 0|fan|Package' | grep -o -E ":\s*([\+0-9\.°]+)" | sed 's/\([0-9]*\)[\.][0-9]*/\1/g') && sens=${sens// /} && sens=${sens//:/} && echo ${sens}
+    sens=$(sensors | grep -E 'power1|temp1|Core 0|fan|Package|Tctl' | grep -o -E ":\s*([\+0-9\.°]+)" | sed 's/\([0-9]*\)[\.][0-9]*/\1/g') && sens=${sens// /} && sens=${sens//:/} && echo ${sens}
 }
 mkalias_with_prefix 'sensors_one_line'
 
