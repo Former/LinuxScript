@@ -11,10 +11,18 @@ alias ${prefix}archive_each_file_into_separate_archive="find . -mindepth 1 -maxd
 
 unicode_U200B_correct ()
 {
-    [ $1 == '' ] && printf "Корректировка ошибки в latex U200B\nУкажите входной файл" && return
+    [ '$1' == '' ] && printf "Корректировка ошибки в latex U200B\nУкажите входной файл" && return
     perl -CSD -pe "s/\N{U+200B}//gu" < $1 > noU200B_$1
 }
 mkalias_with_prefix 'unicode_U200B_correct'
+
+unicode_U202F_correct ()
+{
+    [ '$1' == '' ] && printf "Корректировка ошибки в latex U202F\nУкажите входной файл" && return
+    perl -CSD -pe "s/\N{U+202F}//gu" < $1 > noU202F_$1
+}
+mkalias_with_prefix 'unicode_U202F_correct'
+
 
 festival_txt2mp3 ()
 {
