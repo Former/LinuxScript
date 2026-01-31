@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2025 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
+# Copyright 2025-2026 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
 # License: Public domain: http://unlicense.org/ 
 # Общественное достояние 
 
@@ -334,32 +334,8 @@ backup_crontab_etc()
 }
 mkalias_with_prefix 'backup_crontab_etc'
 
-backup()
-{
-    # Резервное копирование git и пр.
-
-    version=1.0
-
-    # Формат:
-    # "Однобуквенная команда|Расширенная команда|Справка|Параметр|Значение по умолчанию|Команда на исполнение"
-    # Параметр: Пусто - нет параметров, : - есть параметр, :: - параметр не обязателен
-
-    common_params=(
-        "h|help|Посмотреть помощь.|||ShowHelp; return 1;"
-        "v|version|Посмотреть версию программы.|||echo \$version; return 1;"
-        "V|verbose|Подробный вывод.||''|verbose=true"
-        "t|test|Тестовый запуск||''|test=true"
-        )
-
-    input_params=(
-        "u|urls|Входной файл со ссылками и именами папок.|:||"
-        "b|base_dir|Начальная папка. По умолчанию '!DEFAULT!'.|:|$(pwd)|"
-        )
-
-    all_params=("${common_params[@]}" "${input_params[@]}")
-
-    function ShowHelp() {
-        echo "
+function ShowHelpBackup() {
+	echo "
 Использование: backup -u <ursls.txt> [-hVt]
 Бэкап списка ссылок
 
@@ -372,15 +348,63 @@ $(ProcessParams input_params Params2Help)
 Примеры:
 
 backup -u urls.txt 
+
+Пример Файла urls.txt:
+'
+{ git
+	{ my_github
+		https://github.com/Former/LinuxScript
+	} # my_github
+	{ linux
+		https://github.com/torvalds/linux.git
+		https://github.com/gcc-mirror/gcc.git
+	} # linux
+}
+'
 "
-		return 0
-    }
+	return 0
+}
 
-    mainloop="$(MakeMainLoop 'all_params')"
+pull_or_clone()
+{
+    url=$1
+    basename=$(basename "${url}")
+    dir_name="${basename%.*}"
+    git -C "${dir_name}" pull || git clone "${url}"
+}
 
-    # -------------------------------------------
+wget_backup()
+{
+	url=$1
+	wget -c ––tries=100 "${url}"
+}
+
+backup()
+{
+    # Резервное копирование git и пр.
+
+    version=1.0
+
+    # Формат:
+    # "Однобуквенная команда|Расширенная команда|Справка|Параметр|Значение по умолчанию|Команда на исполнение"
+    # Параметр: Пусто - нет параметров, : - есть параметр, :: - параметр не обязателен
+
+    common_params=(
+        "h|help|Посмотреть помощь.|||ShowHelpBackup; return 1;"
+        "v|version|Посмотреть версию программы.|||echo \$version; return 1;"
+        "V|verbose|Подробный вывод.||''|verbose=true"
+        "t|test|Тестовый запуск||''|test=true"
+        )
+
+    input_params=(
+        "u|urls|Входной файл со ссылками и именами папок.|:||"
+        "b|base_dir|Начальная папка. По умолчанию '!DEFAULT!'.|:|$(pwd)|"
+        )
+
+    all_params=("${common_params[@]}" "${input_params[@]}")
 
     # Главный цикл обработки входных параметров
+    mainloop="$(MakeMainLoop 'all_params')"
     
     #[ $verbose ] && echo "mainloop = ${mainloop}"
     eval "${mainloop}"
@@ -391,12 +415,69 @@ backup -u urls.txt
 
     if [ "${urls}" = "" ] || [ "${unuse_param}" != "" ]; then
         [ "${unuse_param}" != "" ] && echo "Параметры не расшифрованы '${unuse_param}'" 
-        ShowHelp
+        ShowHelpBackup
         return 1
     fi
 
-    [ $verbose ] && echo "Входное имя файла '${urls}'"; }
+    [ $verbose ] && echo "Входное имя файла '${urls}'"; 
+
+	urls_file=$(cat "${urls}")
+	
+	cd "${base_dir}"
+	
+	parent_dirs=("$(pwd)")
+	
+	while read -r line; do
+		line=$(trim "${line}")
+		# [ $verbose ] && echo "line = .${line}."
+		firstchar=${line:0:1}
+		[ "${firstchar}" = "#" ] && continue
+		[ "${line}" = "" ] && continue
+		if [ "${firstchar}" = "{" ]; then
+			parent_dirs+=("$(pwd)")
+			d=${line:1}
+			mkdir ${d}
+			cd ${d}
+			[ $verbose ] && echo "Push dir ${d}"
+			continue
+		fi
+		
+		if [ "${line}" = "}" ]; then
+			cd "${parent_dirs[-1]}"
+			#local lenm1=$((${#parent_dirs[@]}-1))
+			parent_dirs=${parent_dirs:0:-1}
+			[ $verbose ] && echo "Up dir $(pwd)"
+			continue
+		fi
+		
+		cmd="wget_backup"
+		if [[ "${line}" == *"/github.com/"* ]] || [[ "${line}" == *".git" ]]; then 
+			cmd="pull_or_clone"
+		fi
+		
+		if [ "${test}" != "" ]; then
+			echo "$cmd '${line}'"
+		else
+			$cmd "${line}"
+			[ $verbose ] && echo "$cmd '${line}'"
+		fi
+	done < <(printf '%s\n' "${urls_file}") 
+
+	cd "${base_dir}"
 
     return 0
 }
 mkalias_with_prefix 'backup'
+
+trim() {
+    # Determine if 'extglob' is currently on.
+    local extglobWasOff=1
+    shopt extglob >/dev/null && extglobWasOff=0 
+    (( extglobWasOff )) && shopt -s extglob # Turn 'extglob' on, if currently turned off.
+    # Trim leading and trailing whitespace
+    local var=$1
+    var=${var##+([[:space:]])}
+    var=${var%%+([[:space:]])}
+    (( extglobWasOff )) && shopt -u extglob # If 'extglob' was off before, turn it back off.
+    echo -n "$var"  # Output trimmed string.
+}
