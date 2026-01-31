@@ -369,8 +369,10 @@ pull_or_clone()
 {
     url=$1
     basename=$(basename "${url}")
-    dir_name="${basename%.*}"
-    git -C "${dir_name}" pull || git clone "${url}"
+    dir_name="${basename}.git" #"${basename%.*}"
+    echo "dir_name = ${dir_name}"
+    #git -C "${dir_name}" pull || git clone --bare "${url}"
+    git -C "${dir_name}" fetch origin +refs/heads/*:refs/heads/* --prune || git clone --bare "${url}"
 }
 
 wget_backup()
