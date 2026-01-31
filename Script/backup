@@ -333,3 +333,70 @@ backup_crontab_etc()
     crontab_add "${cmd}" ${sudo_}
 }
 mkalias_with_prefix 'backup_crontab_etc'
+
+backup()
+{
+    # Резервное копирование git и пр.
+
+    version=1.0
+
+    # Формат:
+    # "Однобуквенная команда|Расширенная команда|Справка|Параметр|Значение по умолчанию|Команда на исполнение"
+    # Параметр: Пусто - нет параметров, : - есть параметр, :: - параметр не обязателен
+
+    common_params=(
+        "h|help|Посмотреть помощь.|||ShowHelp; return 1;"
+        "v|version|Посмотреть версию программы.|||echo \$version; return 1;"
+        "V|verbose|Подробный вывод.||''|verbose=true"
+        "t|test|Тестовый запуск||''|test=true"
+        )
+
+    input_params=(
+        "u|urls|Входной файл со ссылками и именами папок.|:||"
+        "b|base_dir|Начальная папка. По умолчанию '!DEFAULT!'.|:|$(pwd)|"
+        )
+
+    all_params=("${common_params[@]}" "${input_params[@]}")
+
+    function ShowHelp() {
+        echo "
+Использование: backup -u <ursls.txt> [-hVt]
+Бэкап списка ссылок
+
+Общие параметры
+$(ProcessParams common_params Params2Help)
+
+Входные параметры 
+$(ProcessParams input_params Params2Help)
+
+Примеры:
+
+backup -u urls.txt 
+"
+		return 0
+    }
+
+    mainloop="$(MakeMainLoop 'all_params')"
+
+    # -------------------------------------------
+
+    # Главный цикл обработки входных параметров
+    
+    #[ $verbose ] && echo "mainloop = ${mainloop}"
+    eval "${mainloop}"
+
+    unuse_param="$*"
+
+	[ $verbose ] && echo "test = $test; verbose = '${verbose}';unuse_param = ${unuse_param}; urls = ${urls}; base_dir = ${base_dir};"
+
+    if [ "${urls}" = "" ] || [ "${unuse_param}" != "" ]; then
+        [ "${unuse_param}" != "" ] && echo "Параметры не расшифрованы '${unuse_param}'" 
+        ShowHelp
+        return 1
+    fi
+
+    [ $verbose ] && echo "Входное имя файла '${urls}'"; }
+
+    return 0
+}
+mkalias_with_prefix 'backup'

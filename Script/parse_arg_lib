@@ -47,8 +47,8 @@ param_var='local small_cmd="$1";local large_cmd="$2";local comment="$3";local us
 function Params2InitVar {
     eval "$param_var"
 
-    if [ "$use_param" != '' ]; then
-        eval "${large_cmd}=${default}"
+    if [ "$use_param" != '' ] || [ "$default" != '' ]; then
+        eval "export ${large_cmd}=${default}"
     fi
 }
 
@@ -73,19 +73,25 @@ function Params2large_list {
 
 function Params2Case {
     eval "$param_var"
+    # echo "Params2Case custom_arg1=$custom_arg1 custom_arg2=$custom_arg2 large_cmd=$large_cmd small_cmd=$small_cmd custom_cmd=.${custom_cmd}."
 
     if [ "$custom_arg1" = "-${small_cmd}" ] || [ "$custom_arg1" = "-${large_cmd}" ] || [ "$custom_arg1" = "--${large_cmd}" ]; then
-        clear_custom_cmd="${custom_cmd//[$\'\t\r\n \']/}" 
+        clear_custom_cmd=${custom_cmd//[![:print:]]/}
+        # echo "clear_custom_cmd = .${clear_custom_cmd}. custom_cmd = .${custom_cmd}."
         if [ "${clear_custom_cmd}" != "" ]; then
             eval "${custom_cmd}"
+            # echo "custom_cmd = ${custom_cmd}"
         else
-            eval "${large_cmd}=\"$custom_arg2\""
+            eval "export ${large_cmd}=\"${custom_arg2}\""
+            # echo "large_cmd = ${large_cmd}, ${custom_arg2}"
+            shift
         fi
     fi
 }
 
 function MakeMainLoop {
     all_params_var_name=$1
+    
     mainloop='
     # Инициализация переменных
     ProcessParams all_params_array Params2InitVar
@@ -99,11 +105,16 @@ function MakeMainLoop {
     # "h" is a no-value option.
     # "v:" implies that option -v has value and is a mandatory option. ":" means has a value.
     # "t::" implies that option -t has value but is optional. "::" means optional.
+
     small_params_list=$(ProcessParams all_params_array Params2small_list)
     small_params_list="${small_params_list:1}"
 
+    # echo "MakeMainLoop small_params_list ${small_params_list}"
+
     large_params_list=$(ProcessParams all_params_array Params2large_list)
     large_params_list="${large_params_list:1}"
+
+    # echo "MakeMainLoop large_params_list ${large_params_list}"
 
     options=$(getopt --long "$large_params_list" -o "$small_params_list" -a -- "$@")
 
@@ -112,7 +123,14 @@ function MakeMainLoop {
     # are set to the arguments, even if some of them begin with a ‘-’.
     eval set -- "$options"
 
-    while true; do cur_arg="$1"; [ "$cur_arg" = "--" ] && { shift; break; }; ProcessParams all_params_array Params2Case "$cur_arg" "$2"; shift; done
+    while true; do 
+		cur_arg="$1"; 
+		# echo "cur_arg = $cur_arg"
+		[ "$cur_arg" = "--" ] && { shift; break; }; 
+		ProcessParams all_params_array Params2Case "$cur_arg" "$2"; 
+		shift; 
+	done
     '
-    return "${mainloop//all_params_array/$all_params_var_name}"
+    
+    echo "${mainloop//all_params_array/$all_params_var_name}"
 }
