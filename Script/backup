@@ -365,14 +365,22 @@ backup -u urls.txt
 	return 0
 }
 
-pull_or_clone()
+pull_or_clone_bare()
 {
     url=$1
     basename=$(basename "${url}")
     dir_name="${basename}.git" #"${basename%.*}"
-    echo "dir_name = ${dir_name}"
-    #git -C "${dir_name}" pull || git clone --bare "${url}"
+    #echo "dir_name = ${dir_name}"
     git -C "${dir_name}" fetch origin +refs/heads/*:refs/heads/* --prune || git clone --bare "${url}"
+}
+
+pull_or_clone()
+{
+    url=$1
+    basename=$(basename "${url}")
+    dir_name="${basename%.*}"
+    #echo "dir_name = ${dir_name}"
+    git -C "${dir_name}" pull || git clone --bare "${url}"
 }
 
 wget_backup()
@@ -453,8 +461,10 @@ backup()
 		fi
 		
 		cmd="wget_backup"
-		if [[ "${line}" == *"/github.com/"* ]] || [[ "${line}" == *".git" ]]; then 
+		if [[ "${line}" == *"git@github.com"* ]]; then 
 			cmd="pull_or_clone"
+		elif [[ "${line}" == *"/github.com/"* ]] || [[ "${line}" == *".git" ]]; then 
+			cmd="pull_or_clone_bare"
 		fi
 		
 		if [ "${test}" != "" ]; then
