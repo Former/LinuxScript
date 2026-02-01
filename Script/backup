@@ -380,7 +380,7 @@ pull_or_clone()
     basename=$(basename "${url}")
     dir_name="${basename%.*}"
     #echo "dir_name = ${dir_name}"
-    git -C "${dir_name}" pull || git clone --bare "${url}"
+    git -C "${dir_name}" pull || git clone "${url}"
 }
 
 wget_backup()
@@ -461,7 +461,7 @@ backup()
 		fi
 		
 		cmd="wget_backup"
-		if [[ "${line}" == *"git@github.com"* ]]; then 
+		if [[ "${line}" == "git@github.com"* ]]; then 
 			cmd="pull_or_clone"
 		elif [[ "${line}" == *"/github.com/"* ]] || [[ "${line}" == *".git" ]]; then 
 			cmd="pull_or_clone_bare"
