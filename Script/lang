@@ -46,3 +46,16 @@ EOF
 mkalias_with_prefix 'lang_switch'
 
 
+lang_buffer_switch()
+{
+    # Переключение раскладки в буфере обмена
+    str=`xsel -ob`
+    #echo "str = ${str}"
+    str_sw=`lang_switch "${str}"`
+    #echo "str_sw = ${str_sw}"
+    echo "${str_sw}" | xsel -ib
+
+    #    str=`xsel -ob`
+    #    echo "str = ${str}"
+}
+mkalias_with_prefix 'lang_buffer_switch'

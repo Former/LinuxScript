@@ -29,7 +29,7 @@ install_alt_linux_progs()
 {
  printf "Установка важных программ\n"
  sudo apt-get install \
-     pwgen xclip audacious audacity \
+     pwgen audacious audacity \
      gparted testdisk gnome-disk-utility baobab pv \
      cpu-x gnome-system-monitor \
      wol sshfs traceroute encfs openssh-server nmap\
@@ -69,7 +69,8 @@ install_alt_linux_progs()
      solvespace blender \
      virtualbox \
      token-manager \
-     qtox 
+     qtox \
+     xsel xclip
 }
 mkalias_with_prefix 'install_alt_linux_progs'
 

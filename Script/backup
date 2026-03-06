@@ -389,6 +389,34 @@ wget_backup()
 	wget -c ––tries=100 "${url}"
 }
 
+my_repos()
+{
+    echo "git@github.com:Former/LinuxScript.git
+git@github.com:Former/3Force.git
+git@github.com:Former/HtmlCheckers.git
+git@github.com:Former/3D_print_project.git
+git@github.com:Former/wav2num.git
+git@github.com:Former/Python_simple.git
+git@github.com:Former/Obfuscator.git
+git@github.com:Former/Contacts_Parser.git
+git@github.com:Former/IceWM_Desktop_Config.git
+git@github.com:Former/Scratch_simple.git
+git@github.com:Former/timecode_maker.git
+git@github.com:Former/LC3_script_tools.git
+git@github.com:Former/Parse_qa_fkt-altai_to_wiki.git
+git@github.com:Former/ScriptTest_Lua_and_Python_in_Cpp.git
+git@github.com:Former/vnt_decoder.git
+git@github.com:Former/lc3sim-c.git
+git@github.com:Former/vmir.git
+git@github.com:Former/stackl.git
+git@github.com:Former/RIOT.git
+git@github.com:Former/luascript.git
+git@github.com:Former/CircleWorld.git
+git@github.com:Former/StepMotorDriver.git
+git@github.com:Former/LPT_Module.git
+git@github.com:Former/GPL_3D_Scaner.git"
+}
+
 backup()
 {
     # Резервное копирование git и пр.
@@ -403,6 +431,7 @@ backup()
         "h|help|Посмотреть помощь.|||ShowHelpBackup; return 1;"
         "v|version|Посмотреть версию программы.|||echo \$version; return 1;"
         "V|verbose|Подробный вывод.||''|verbose=true"
+        "m|my_repo|Мои репозитории||''|my_repo=true"
         "t|test|Тестовый запуск||''|test=true"
         )
 
@@ -421,18 +450,22 @@ backup()
 
     unuse_param="$*"
 
-	[ $verbose ] && echo "test = $test; verbose = '${verbose}';unuse_param = ${unuse_param}; urls = ${urls}; base_dir = ${base_dir};"
+    [ $verbose ] && echo "test = $test; verbose = '${verbose}';unuse_param = ${unuse_param}; urls = ${urls}; base_dir = ${base_dir}; my_repo = ${my_repo};"
 
-    if [ "${urls}" = "" ] || [ "${unuse_param}" != "" ]; then
+    if ([ "${urls}" = "" ] && [ "${my_repo}" = "" ]) || [ "${unuse_param}" != "" ]; then
         [ "${unuse_param}" != "" ] && echo "Параметры не расшифрованы '${unuse_param}'" 
         ShowHelpBackup
         return 1
     fi
 
     [ $verbose ] && echo "Входное имя файла '${urls}'"; 
-
-	urls_file=$(cat "${urls}")
-	
+    
+    if 	[ ${my_repo} ]; then 
+        urls_file=$(my_repos)
+    else
+        urls_file=$(cat "${urls}")
+    fi
+    
 	cd "${base_dir}"
 	
 	parent_dirs=("$(pwd)")
@@ -493,3 +526,12 @@ trim() {
     (( extglobWasOff )) && shopt -u extglob # If 'extglob' was off before, turn it back off.
     echo -n "$var"  # Output trimmed string.
 }
+
+backup_my_repos()
+{
+    eval `gnome-keyring-daemon --start`
+
+    backup -m
+}
+mkalias_with_prefix 'backup_my_repos'
+
