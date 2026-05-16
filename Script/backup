@@ -58,9 +58,9 @@ backup_delete_old_files_by_date()
         backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*1v.*'}" "${file_max_count_period2}" '11v-'
         backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*11v-.*'}" "${file_max_count_period3}" '________NOTHONG___________'
     else
-        backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*'}" "${file_max_count_period1}" 'm_01d|y_03m_01d'
-        backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*m_01d.*'}" "${file_max_count_period2}" 'y_03m_01d'
-        backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*y_03m_01d.*'}" "${file_max_count_period3}" '________NOTHONG___________'
+        backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*'}" "${file_max_count_period1}" 'm_11d|y_03m_11d'
+        backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*m_11d.*'}" "${file_max_count_period2}" 'y_03m_11d'
+        backup_delete_old_files_by_regex "${backup_dir}" "${file_name_template//'@DATE'/'.*y_03m_11d.*'}" "${file_max_count_period3}" '________NOTHONG___________'
     fi
 }
 mkalias_with_prefix 'backup_delete_old_files_by_date'
@@ -69,9 +69,9 @@ backup_delete_old_files_by_date_test_for_day()
 {
     for (( y = 2001; y < 2010; y++ )) do
         for (( m = 1; m < 10; m++ )) do
-            for (( d = 1; d < 10; d++ )) do
-                touch "backup_$(backup_make_date ${y} ${m} ${d} 01 02 03 04).zip";
-                backup_delete_old_files_by_date ./ "backup_@DATE\.zip" 4 3 2 day;
+            for (( d = 10; d < 29; d++ )) do
+                touch "backup_$(backup_make_date ${y} 0${m} ${d} 01 02 03 04).zip";
+                backup_delete_old_files_by_date ./ "backup_@DATE\.zip" 4 3 2;
                 sleep 0.15;
             done;
         done;
