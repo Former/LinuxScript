@@ -27,8 +27,9 @@ mkalias_with_prefix 'install_alt_linux_system_full_upgrade'
 
 install_alt_linux_progs()
 {
- printf "Установка важных программ\n"
- sudo apt-get install \
+    printf "Установка важных программ\n"
+    ask_continue && return
+    sudo apt-get install \
      pwgen audacious audacity \
      gparted testdisk gnome-disk-utility baobab pv \
      cpu-x gnome-system-monitor \
@@ -38,7 +39,8 @@ install_alt_linux_progs()
      geany geany-plugins screen \
      git gitg gitk git-cola lazygit \
      golang sqlite3 nodejs \
-     build-environment ctest gcc-c++ gcc clang \
+     ctest gcc-c++ gcc clang \
+     npm \
      flex libncurses-devel \
      gimp pinta mypaint xviewer \
      firefox dillo links2 \
@@ -48,7 +50,7 @@ install_alt_linux_progs()
      texlive texstudio \
      systemd-settings-disable-kill-user-processes \
      retext pdfmod ripgrep \
-     gedit gedit-plugins gedit-plugin-devhelp gedit-plugins-latex \
+     gedit gedit-plugins gedit-plugin-devhelp \
      cinnamon-full idesk icewm pcmanfm volumeicon mc \
      nemo nemo-arronax nemo-extensions-translations nemo-fileroller \
      nemo-image-converter nemo-preview nemo-preview-gir-devel nemo-python nemo-python-devel \
@@ -63,14 +65,16 @@ install_alt_linux_progs()
      meld kdiff3 \
      python3-module-pip \
      NetworkManager-tui \
-     flatpak\
-     tlp\
-     syncthing\
+     flatpak \
+     tlp \
+     syncthing \
      solvespace blender \
      virtualbox \
      token-manager \
      qtox \
      xsel xclip
+
+    npm install pnpm
 }
 mkalias_with_prefix 'install_alt_linux_progs'
 
