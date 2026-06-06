@@ -580,16 +580,18 @@ backup()
 		
 		cmd="wget_backup"
 		if [[ "${line}" == "git@github.com"* ]]; then 
-			cmd="pull_or_clone"
+			cmd="pull_or_clone '${line}'"
+		elif [[ "${line}" == "wget"* ]]; then 
+			cmd="${line}"
 		elif [[ "${line}" == *"/github.com/"* ]] || [[ "${line}" == *".git" ]]; then 
-			cmd="pull_or_clone_bare"
+			cmd="pull_or_clone_bare '${line}'"
 		fi
 		
 		if [ "${test}" != "" ]; then
-			echo "$cmd '${line}'"
+			echo "$cmd"
 		else
 			$cmd "${line}"
-			[ $verbose ] && echo "$cmd '${line}'"
+			[ $verbose ] && echo "$cmd"
 		fi
 	done < <(printf '%s\n' "${urls_file}") 
 

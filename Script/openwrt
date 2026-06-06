@@ -204,12 +204,30 @@ sudo apt-get install gcc-multilib g++-multilib git libncurses-dev gawk perl pyth
 }
 mkalias_with_prefix 'openwrt_n2n_make_ipk'
 
+openwrt_install_yota()
+{
+    printf "
+    opkg update
+    opkg install kmod-usb-net kmod-usb-net-asix kmod-usb-net-cdc-ether kmod-usb-net-rndis kmod-usb-ohci
+    "
+    #ask_continue && return
+}
+mkalias_with_prefix 'openwrt_install_yota'
+
+openwrt_install_n2n()
+{
+    printf "
+    cron:
+    0 1 * * * service edge restart
+    "
+    #ask_continue && return
+}
+mkalias_with_prefix 'openwrt_install_n2n'
+
 openwrt_()
 {
     printf "Загрузка\n"
     ask_continue && return
 }
 #mkalias_with_prefix 'openwrt_'
-
-
 

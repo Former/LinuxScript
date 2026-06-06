@@ -119,3 +119,9 @@ gitg_alias()
     gitg
 }
 mkalias_with_prefix 'gitg_alias'
+
+vbox_img_to_vdi()
+{
+    VBoxManage convertfromraw $1 $1.vdi
+}
+mkalias_with_prefix 'vbox_img_to_vdi'
