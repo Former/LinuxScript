@@ -36,6 +36,7 @@ install_alt_linux_progs()
      wol sshfs traceroute encfs openssh-server nmap\
      remmina xrdp qbittorrent \
      filezilla \
+     atftp \
      geany geany-plugins screen \
      git gitg gitk git-cola lazygit \
      golang sqlite3 nodejs \
