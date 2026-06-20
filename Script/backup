@@ -484,7 +484,8 @@ wget_r()
     #echo "${#counts}"
     count=$((${#counts} - 1))
     #echo "${count}"
-    wget -r -c ––tries=100 --cut-dirs="50" "${url}"
+    #wget -r -c ––tries=100 --cut-dirs="50" "${url}"
+    wget -r --cut-dirs=50 -np -nH -c "${url}"
 }
 
 
