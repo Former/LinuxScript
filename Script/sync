@@ -1,17 +1,43 @@
 #!/bin/bash
 
-# Copyright 2025 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
+# Copyright 2025-2026 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
 # License: Public domain: http://unlicense.org/ 
 # Общественное достояние 
 
 [ "${alias_dir}" = "" ] && alias_dir=$(pwd)
 source "${alias_dir}/common"
 
+sync_from()
+{
+    mkhelp 'Односторонняя синхронизация
+Использование:
+sync_from src [opt1] [opt2]
+
+1. Опция "-n" для теста
+2. Опция "--delete" для удаления файлов
+' $1 && return
+
+    src=$1
+    dest=$(pwd)
+    opt1=$2
+    opt2=$3
+
+    echo "Будет синхронизирована текущая директория '$dest' с дирректирией '$src' с параметрами ${opt1}, ${opt2}"
+    ask_continue && return
+
+    rsync -r -t -v $opt1 $opt2 --progress -s --omit-dir-times "$src" "$dest" 
+}
+mkalias_with_prefix 'sync_from'
+
 sync_2dir()
 {
-    # Двухсторонняя синхронизация
-    # Использование:
-    # ./2sync src dest [opt1] [opt2]
+    mkhelp 'Двухсторонняя синхронизация
+Использование:
+./sync_2dir src dest [opt1] [opt2]
+
+1. Опция "-n" для теста
+2. Опция "--delete" для удаления файлов
+' $1 && return
 
     src=$1
     dest=$2
@@ -25,15 +51,16 @@ mkalias_with_prefix 'sync_2dir'
 
 sync_by_filter()
 {
-    # Двухсторонняя синхронизация с сервером всех объектов в текущей папке
-    # Использование:
-    # sync_by_filter filter dest_base opt1 opt2
-    #   filter - маска по файлам
-    #   dest_base - базовый путь для синхронизации, может содержать сервер, например: backup@www_server:/media/Backup
-    # opt1,2 - дополнительные опции rsync. 
-    # Примеры: 
-    # 1. Опция "-n" для теста
-    # 2. Опция "--delete" для удаления файлов
+    mkhelp 'Двухсторонняя синхронизация с сервером всех объектов в текущей папке
+Использование:
+sync_by_filter filter dest_base opt1 opt2
+    filter - маска по файлам
+    dest_base - базовый путь для синхронизации, может содержать сервер, например: backup@www_server:/media/Backup
+  opt1,2 - дополнительные опции rsync. 
+Примеры: 
+1. Опция "-n" для теста
+2. Опция "--delete" для удаления файлов
+' $1 && return
 
     filter=$1
     dest_base=$2

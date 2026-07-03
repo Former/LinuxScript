@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2025 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
+# Copyright 2025-2026 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
 # License: Public domain: http://unlicense.org/ 
 # Общественное достояние 
 
@@ -36,6 +36,18 @@ mkvar()
     else
         echo "$var_name=$val; [[ \"\${$var_name}\" == \"\" ]] && printf \"${string_to_print_before_return}\\n\" && return;"
     fi
+}
+
+mkhelp()
+{
+    #echo "mkhelp '$1' '$2'"
+    help=$1
+    param=$2
+    if [[ "${param}" == "" || "${param}" == "-h" || "${param}" == "--help" ]]; then
+        echo "$help"
+        return 0
+    fi
+    return 1
 }
 
 

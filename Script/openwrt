@@ -239,9 +239,33 @@ openwrt_install_usb_wifi()
     printf "
 lsusb on linux
 
-For Ralink kernel modules:
+wget https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-rt2800-usb_4.14.267+4.19.221-1-1_mipsel_74kc.ipk
+wget https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-rt2800-lib_4.14.267+4.19.221-1-1_mipsel_74kc.ipk
+wget https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-rt2x00-usb_4.14.267+4.19.221-1-1_mipsel_74kc.ipk
+wget https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-rt2x00-lib_4.14.267+4.19.221-1-1_mipsel_74kc.ipk
+wget https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-mac80211_4.14.267+4.19.221-1-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-gcm_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-ghash_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-ccm_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-cmac_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-ctr_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-seqiv_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-rng_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-sha512_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-hmac_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-manager_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-aead_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-null_4.14.267-1_mipsel_74kc.ipk
+https://archive.openwrt.org/releases/19.07.9/targets/brcm47xx/mips74k/packages/kmod-crypto-gf128_4.14.267-1_mipsel_74kc.ipk
+
+opkg install kmod-crypto-aead_4.14.267-1_mipsel_74kc.ipk kmod-crypto-rng_4.14.267-1_mipsel_74kc.ipk kmod-crypto-ccm_4.14.267-1_mipsel_74kc.ipk kmod-crypto-seqiv_4.14.267-1_mipsel_74kc.ipk kmod-crypto-cmac_4.14.267-1_mipsel_74kc.ipk kmod-crypto-sha512_4.14.267-1_mipsel_74kc.ipk kmod-crypto-ctr_4.14.267-1_mipsel_74kc.ipk kmod-mac80211_4.14.267+4.19.221-1-1_mipsel_74kc.ipk kmod-crypto-gcm_4.14.267-1_mipsel_74kc.ipk kmod-rt2800-lib_4.14.267+4.19.221-1-1_mipsel_74kc.ipk kmod-crypto-gf128_4.14.267-1_mipsel_74kc.ipk kmod-rt2800-usb_4.14.267+4.19.221-1-1_mipsel_74kc.ipk kmod-crypto-ghash_4.14.267-1_mipsel_74kc.ipk kmod-rt2x00-lib_4.14.267+4.19.221-1-1_mipsel_74kc.ipk kmod-crypto-hmac_4.14.267-1_mipsel_74kc.ipk kmod-rt2x00-usb_4.14.267+4.19.221-1-1_mipsel_74kc.ipk kmod-crypto-manager_4.14.267-1_mipsel_74kc.ipk kmod-crypto-null_4.14.267-1_mipsel_74kc.ipk
+
+#For Ralink:
 opkg install kmod-rt2800-usb
 #opkg install kmod-rt2800-usb kmod-crypto-gf128 kmod-crypto-null kmod-crypto-aead kmod-crypto-manager kmod-crypto-hmac kmod-crypto-sha512 kmod-crypto-sha3 kmod-crypto-rng kmod-crypto-geniv kmod-crypto-seqiv kmod-crypto-ctr kmod-crypto-cmac kmod-crypto-ccm kmod-crypto-ghash kmod-crypto-gcm kmod-mac80211 kmod-rt2x00-lib kmod-rt2x00-usb kmod-rt2800-lib kmod-rt2800-usb
+
+#for Atheros 
+opkg install kmod-ath9k-htc
 
 # Далее
 opkg install wifi-scripts
@@ -261,10 +285,60 @@ iw list
 }
 mkalias_with_prefix 'openwrt_install_usb_wifi'
 
+openwrt_install_package_server()
+{
+    ver=$1
+    arch1=$2
+    arch2=$3
+    proc=$4
+    [ "${ver}" = '' ] && ver='24.10.7'
+    [ "${arch1}" = '' ] && arch1='mipsel_74kc'
+    [ "${arch2}" = '' ] && arch2='mips74k'
+    [ "${proc}" = '' ] && proc='bcm47xx'
+
+    echo "В текущей дирректории будет установлен сервер с паектами на ver=${ver} с arch1=${arch1} arch2=${arch2} и proc=${proc} "
+    printf "
+wget_r \"https://archive.openwrt.org/releases/${ver}/targets/${proc}/${arch2}/packages/\"
+wget_r \"https://archive.openwrt.org/releases/${ver}/packages/${arch}/base/\"
+"
+    ask_continue && return
+    
+    start_dir=$(pwd)
+
+    mkdir core
+    cd core
+    #        https://archive.openwrt.org/releases/24.10.7/targets/bcm47xx/mips74k/packages/
+    #wget_r "https://archive.openwrt.org/releases/${ver}/targets/${proc}/${arch2}/packages/"
+    cd "${start_dir}"
+
+    mkdir base
+    cd base
+    wget_r "https://archive.openwrt.org/releases/${ver}/packages/${arch}/base/"
+    cd "${start_dir}"
+
+    echo "
+#Full download
+wget_r https://archive.openwrt.org/releases/${ver}/packages/${arch}/
+"
+    echo "
+src/gz ow_core http://SERVERIP:8081/core
+src/gz ow_base http://SERVERIP:8081/base
+    " >> pkg.list
+
+}
+mkalias_with_prefix 'openwrt_install_package_server'
+
 openwrt_install_mesh()
 {
     printf "
-opkg install wpad-mesh-mbedtls
+wget https://archive.openwrt.org/releases/19.07.9/packages/mipsel_74kc/base/libopenssl1.1_1.1.1n-1_mipsel_74kc.ipk
+wget https://archive.openwrt.org/releases/19.07.9/packages/mipsel_74kc/base/wpad-mesh-openssl_2019-08-08-ca8c2bd2-8_mipsel_74kc.ipk
+
+opkg remove wpad-basic
+opkg install wpad-mesh-openssl_2019-08-08-ca8c2bd2-8_mipsel_74kc.ipk libopenssl1.1_1.1.1n-1_mipsel_74kc.ipk 
+
+
+#opkg install wpad-mesh-mbedtls
 
     "
     #ask_continue && return

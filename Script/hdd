@@ -25,11 +25,33 @@ mkalias_with_prefix 'hdd_fill_random'
 
 hdd_check_zero()
 {
-	in_dev=$1
+    in_dev=$1
     [ "${in_dev}" = "" ] && printf "Проверить, что диск заполнен нулями.\nОшибка! Укажите файл устройства. Например /dev/sdb.\n" && return
     sudo pv ${in_dev} | od | head
 }
 mkalias_with_prefix 'hdd_check_zero'
 
+hdd_remount_read_only()
+{
+    mkhelp 'Перемонтирование в read_only, нужно указать путь к папке диска' $1 && return
+    in_folder_mount=$1
+    sudo mount -o remount,ro "${in_folder_mount}"
+}
+mkalias_with_prefix 'hdd_remount_read_only'
+
+#hdd_param()
+#{
+    #echo "1 $1"
+    #echo "2 $2"
+    #echo "3 $3"
+    #echo "4 $4"
+    #echo "* $*"
+#}
+#mkalias_with_prefix 'hdd_param'
 
 
+#hdd_test()
+#{
+    #hdd_param $@ $* $#
+#}
+#mkalias_with_prefix 'hdd_test'
