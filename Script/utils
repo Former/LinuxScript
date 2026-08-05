@@ -138,3 +138,18 @@ http_file_server_start()
     python3 -m http.server "${port}"
 }
 mkalias_with_prefix 'http_file_server_start'
+
+net_mac_change()
+{
+# net - name by ifconfig
+    net=$1
+    mac=$2
+
+    echo "Будет изменён в сети (${net}) mac адрес на ${mac}"
+    ask_continue && return
+    
+    sudo ifconfig ${net} down
+    sudo ifconfig ${net} hw ether ${mac}
+    sudo ifconfig ${net} up
+}
+mkalias_with_prefix 'net_mac_change'

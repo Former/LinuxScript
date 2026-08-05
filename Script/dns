@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Copyright 2026 by Alexei Bezborodov <AlexeiBv+linux_script@narod.ru> 
+# License: Public domain: http://unlicense.org/ 
+# Общественное достояние 
+
+[ "${alias_dir}" = "" ] && alias_dir=$(pwd)
+source "${alias_dir}/common"
+
+dns_trace()
+{
+    eval $(mkvar 'host|$1||Укажите адрес')
+    dig +trace "${host}"
+    nslookup -type=ns "${host}"
+    dig "${host}"
+}
+mkalias_with_prefix 'dns_trace'
+
+dns_reg_ru()
+{
+    eval $(mkvar 'host|$1||Укажите адрес')
+    nslookup "${host}" "ns1.hosting.reg.ru"
+    nslookup "${host}" "ns2.hosting.reg.ru"
+}
+mkalias_with_prefix 'dns_reg_ru'

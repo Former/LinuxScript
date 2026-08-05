@@ -22,5 +22,6 @@ source "${alias_dir}/backup"
 source "${alias_dir}/sync"
 source "${alias_dir}/rpm"
 source "${alias_dir}/systemctl"
+source "${alias_dir}/dns"
 
 

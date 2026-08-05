@@ -227,9 +227,9 @@ mkalias_with_prefix 'openwrt_install_yota'
 openwrt_install_n2n()
 {
     printf "
-    cron:
-    0 1 * * * service edge restart
-    "
+cron:
+0 1 * * * service edge restart
+"
     #ask_continue && return
 }
 mkalias_with_prefix 'openwrt_install_n2n'
@@ -372,6 +372,23 @@ sudo sync
     #ask_continue && return
 }
 mkalias_with_prefix 'openwrt_install_rpi'
+
+openwrt_asus_rt_n16_wifi()
+{
+    printf "
+    # removing previous modules 
+    opkg remove kmod-b43 kmod-b43legacy kmod-mac80211 kmod-cfg80211 kmod-brcmsmac
+    # installing proprietary module and supported packages
+    opkg update; opkg install kmod-brcm-wl nas wlc wl 
+    # cleaning up wireless configuration and rebooting device
+    rm -f /etc/config/wireless;
+
+    #reboot
+    wifi config
+    wifi reload
+    \n"
+}
+#mkalias_with_prefix 'openwrt_'
 
 openwrt_()
 {
