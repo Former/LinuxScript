@@ -230,6 +230,12 @@ exclude_home='
 --exclude=build/*.obj \
 --exclude=chromium/*/WebStorage \
 --exclude=.android \
+--exclude=.config/*/CacheStorage \
+--exclude=.config/libreoffice/*/backup \
+--exclude=.config/*/Cache_Data \
+--exclude=yandex-browser/component_crx_cache \
+--exclude=.mozilla/firefox/*/storage/permanent/chrome/idb \
+--exclude=.zoom \
 --exclude=.VirtualBox/*.iso \
 '
 

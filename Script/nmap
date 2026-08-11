@@ -13,7 +13,7 @@ nmap_scan_hosts()
     in_mask=$2
     [ "${in_mask}" = "" ] && in_mask=24
     [ "${in_host_pattern}" = "" ] && printf "Укажите шаблон адреса без последнего параметра, например '192.168.1'\n" && return
-    cmd1="ips=\$(nmap -sn ${in_host_pattern}.1/${in_mask} | grep 'Nmap scan' | grep -o -E '${in_host_pattern}.[0-9\.]+' | grep -o ..$)"
+    cmd1="ips=\$(nmap -sn ${in_host_pattern}.1/${in_mask} | grep 'Nmap scan' | grep -o -E '${in_host_pattern}.[0-9\.]+' | grep -o ..$ | tr -d '.')"
     cmd2=' && echo ${ips}'
     cmd="${cmd1}${cmd2}"
     echo "${cmd}"
